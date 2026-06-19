@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2f5132">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Rosengarten 2026">
+<title>Rosengarten trip · June 2026</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<style>
+  :root {
+    --bg: #f5f1e8;
+    --card: #ffffff;
+    --ink: #292824;
+    --muted: #776f62;
+    --line: #d9d0c1;
+    --forest: #2f5132;
+    --forest-soft: #e5eedf;
+    --stone: #4e5956;
+    --gold: #b8945e;
+    --gold-soft: #f2e5cc;
+    --warn: #9a5d44;
+    --warn-soft: #f2e2d8;
+    --sky: #dfe9ed;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.55;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 24px 20px 64px; }
+  header {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 22px;
+    align-items: stretch;
+    margin-bottom: 20px;
+  }
+  @media (max-width: 820px) { header { grid-template-columns: 1fr; } }
+  h1 { margin: 0 0 8px; color: var(--forest); font-size: 2rem; line-height: 1.14; }
+  h2 { margin: 26px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--line); font-size: 1.22rem; }
+  h3 { margin: 0 0 8px; font-size: 1.02rem; }
+  h4 { margin: 14px 0 6px; color: var(--muted); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; }
+  p { margin: 7px 0; }
+  ul { margin: 8px 0; padding-left: 19px; }
+  li { margin: 4px 0; }
+  a { color: var(--forest); text-decoration: none; border-bottom: 1px solid currentColor; }
+  table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.94rem; }
+  th, td { text-align: left; vertical-align: top; padding: 10px 9px; border-bottom: 1px solid var(--line); }
+  th { background: rgba(47,81,50,0.08); color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; }
+  tr:last-child td { border-bottom: none; }
+  .hero {
+    background:
+      linear-gradient(180deg, rgba(24,35,29,0.30), rgba(24,35,29,0.66)),
+      url("https://commons.wikimedia.org/wiki/Special:FilePath/2006-Vajolet.jpg?width=1280");
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px;
+    min-height: 290px;
+    display: flex;
+    align-items: flex-end;
+    padding: 24px;
+    color: #fff;
+  }
+  .hero h1 { color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,0.35); }
+  .hero p { max-width: 760px; color: rgba(255,255,255,0.92); }
+  .panel, .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 16px 18px;
+  }
+  .panel { display: flex; flex-direction: column; justify-content: center; }
+  .sub { color: var(--muted); font-size: 0.95rem; }
+  .grid { display: grid; gap: 14px; }
+  .grid-2 { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .grid-3 { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  @media (max-width: 820px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+  .badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin: 0 5px 5px 0;
+  }
+  .b-fixed { background: var(--forest); color: #fff; }
+  .b-booked { background: var(--gold); color: #362511; }
+  .b-risk { background: var(--warn); color: #fff; }
+  .b-soft { background: var(--forest-soft); color: var(--forest); }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .metric { background: rgba(255,255,255,0.88); color: var(--ink); border-radius: 6px; padding: 7px 10px; font-size: 0.86rem; }
+  .metric strong { color: var(--forest); }
+  .timeline { list-style: none; padding: 0; margin: 0; }
+  .timeline li { display: grid; grid-template-columns: 94px 1fr; gap: 12px; padding: 9px 0; border-bottom: 1px dashed var(--line); }
+  .timeline li:last-child { border-bottom: none; }
+  .time { color: var(--forest); font-weight: 700; font-size: 0.92rem; }
+  .note, .warn, .ok {
+    border-left: 3px solid var(--stone);
+    padding: 12px 14px;
+    margin: 14px 0;
+    border-radius: 0 6px 6px 0;
+    background: var(--sky);
+  }
+  .warn { border-left-color: var(--warn); background: var(--warn-soft); }
+  .ok { border-left-color: var(--forest); background: var(--forest-soft); }
+  #map { height: 360px; border: 1px solid var(--line); border-radius: 8px; margin-top: 12px; }
+  .day-table td:first-child { white-space: nowrap; font-weight: 700; color: var(--forest); }
+  .booked-row { background: var(--gold-soft); }
+  .crux-row { background: var(--warn-soft); }
+  .checklist { list-style: none; padding: 0; }
+  .checklist li { padding: 7px 0; border-bottom: 1px dashed var(--line); }
+  .checklist input { margin-right: 8px; accent-color: var(--forest); }
+  .small { font-size: 0.84rem; color: var(--muted); }
+  .week-schedule { overflow-x: auto; }
+  .week-schedule table { min-width: 860px; }
+  .table-scroll { overflow-x: auto; margin-top: 10px; -webkit-overflow-scrolling: touch; }
+  .table-scroll table { min-width: 760px; }
+  .status {
+    display: inline-block;
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .status.booked { background: var(--forest); color: #fff; }
+  .status.requested { background: var(--gold-soft); color: #6b4b1f; border: 1px solid var(--gold); }
+  .status.todo { background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn); }
+  .status.travel { background: var(--sky); color: var(--stone); border: 1px solid #b7c7cc; }
+  .status.ordered { background: var(--forest-soft); color: var(--forest); border: 1px solid var(--forest); }
+  .action-list { display: grid; gap: 10px; margin-top: 8px; }
+  .action-item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.72);
+  }
+  .action-item .status { align-self: start; justify-self: start; }
+  .action-item p { margin: 2px 0 0; font-size: 0.9rem; color: var(--muted); }
+  .compact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .focus-card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }
+  .focus-card strong { color: var(--forest); }
+  .plan-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .plan-head h2 { margin-bottom: 0; flex: 1 1 220px; }
+  .plan-summary {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .plan-pill {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--card);
+    padding: 7px 10px;
+    font-size: 0.84rem;
+    color: var(--muted);
+  }
+  .plan-pill strong { color: var(--forest); }
+  .day-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+  .day-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px;
+    min-height: 190px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .day-card.crux { border-color: var(--warn); background: linear-gradient(180deg, var(--warn-soft), #fff); }
+  .day-card.locked { border-color: rgba(47,81,50,0.4); }
+  .day-top { display: flex; justify-content: space-between; align-items: start; gap: 8px; }
+  .day-date { font-weight: 800; color: var(--forest); }
+  .day-label { color: var(--muted); font-size: 0.8rem; }
+  .day-card h3 { margin: 0; font-size: 1.04rem; }
+  .day-route { color: var(--ink); font-size: 0.92rem; }
+  .day-footer {
+    margin-top: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+  .day-footer strong { display: block; color: var(--forest); font-size: 0.9rem; }
+  .decision-strip { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-top: 14px; }
+  .decision-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .decision-card p { font-size: 0.9rem; }
+  .hut-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 10px 0 14px;
+  }
+  .hut-toolbar input {
+    flex: 1 1 260px;
+    min-width: 220px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 9px 10px;
+    font: inherit;
+  }
+  .btn {
+    border: 1px solid var(--forest);
+    border-radius: 6px;
+    background: var(--forest);
+    color: #fff;
+    padding: 9px 11px;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .btn.secondary { background: var(--card); color: var(--forest); }
+  .hut-intel-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+  .hut-intel-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 330px;
+  }
+  .hut-photo {
+    min-height: 132px;
+    background: linear-gradient(135deg, var(--forest-soft), var(--sky));
+    background-size: cover;
+    background-position: center;
+    position: relative;
+  }
+  .hut-photo::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.04), rgba(0,0,0,0.42));
+  }
+  .hut-photo-label {
+    position: absolute;
+    left: 10px;
+    bottom: 8px;
+    z-index: 1;
+    color: #fff;
+    font-weight: 800;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.42);
+  }
+  .hut-body { padding: 13px 14px 14px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .hut-body h3 { margin: 0; }
+  .hut-meta-line { display: flex; flex-wrap: wrap; gap: 6px; color: var(--muted); font-size: 0.82rem; }
+  .rating-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .stars { color: #b48632; letter-spacing: 0.02em; font-weight: 800; }
+  .review-text { color: var(--muted); font-size: 0.86rem; border-left: 3px solid var(--line); padding-left: 9px; }
+  .hut-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
+  .hut-links a { border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; font-size: 0.82rem; background: #fff; }
+  .api-status { color: var(--muted); font-size: 0.86rem; }
+  .snow-visual { overflow-x: auto; margin-top: 12px; }
+  .snow-visual table { min-width: 860px; }
+  .snow-visual td:first-child { font-weight: 700; color: var(--forest); }
+  .snow-cm {
+    display: inline-block;
+    min-width: 58px;
+    text-align: center;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-weight: 800;
+    background: var(--forest-soft);
+    color: var(--forest);
+  }
+  .snow-cm.watch { background: var(--gold-soft); color: #6b4b1f; border: 1px solid var(--gold); }
+  .snow-cm.high { background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn); }
+  .safety-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin: 12px 0; }
+  .safety-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px;
+  }
+  .safety-card.go { border-color: rgba(47,81,50,0.42); background: linear-gradient(180deg, var(--forest-soft), #fff); }
+  .safety-card.caution { border-color: var(--gold); background: linear-gradient(180deg, var(--gold-soft), #fff); }
+  .safety-card.stop { border-color: var(--warn); background: linear-gradient(180deg, var(--warn-soft), #fff); }
+  .safety-card p { font-size: 0.9rem; }
+  .safety-table { overflow-x: auto; margin-top: 10px; }
+  .safety-table table { min-width: 920px; }
+  .weather-visual { overflow-x: auto; margin-top: 12px; }
+  .weather-visual table { min-width: 920px; }
+  .weather-visual td:first-child { font-weight: 700; color: var(--forest); white-space: nowrap; }
+  .wx-date { color: var(--muted); font-size: 0.78rem; font-weight: 600; }
+  .wx-temp { color: var(--forest); font-weight: 750; white-space: nowrap; }
+  .wx-meta { color: var(--muted); font-size: 0.84rem; }
+  .wx-risk { border-radius: 4px; padding: 3px 7px; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+  .wx-low { background: var(--forest-soft); color: var(--forest); }
+  .wx-med { background: var(--gold-soft); color: #6b4b1f; border: 1px solid var(--gold); }
+  .wx-high { background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn); }
+  .wx-loading { color: var(--muted); font-size: 0.9rem; padding: 12px 0; }
+  .thunder-time { font-weight: 800; color: var(--warn); white-space: nowrap; }
+  details {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin-top: 14px;
+    overflow: hidden;
+  }
+  summary {
+    cursor: pointer;
+    font-weight: 700;
+    padding: 13px 16px;
+    color: var(--forest);
+    user-select: none;
+  }
+  details > *:not(summary) { margin-left: 16px; margin-right: 16px; }
+  @media (max-width: 620px) {
+    .wrap { padding: 18px 12px 60px; }
+    .hero { min-height: 300px; padding: 18px; }
+    h1 { font-size: 1.62rem; }
+    table { font-size: 0.84rem; }
+    th, td { padding: 8px 7px; }
+    .timeline li { grid-template-columns: 78px 1fr; }
+    .compact-grid { grid-template-columns: 1fr; }
+    .action-item { grid-template-columns: 1fr; }
+    .hut-toolbar input, .hut-toolbar .btn { flex-basis: 100%; min-width: 0; width: 100%; }
+    details > *:not(summary) { margin-left: 12px; margin-right: 12px; }
+  }
+  @media (max-width: 900px) {
+    .day-grid, .decision-strip, .hut-intel-grid, .safety-grid { grid-template-columns: 1fr; }
+    .plan-summary { justify-content: flex-start; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="hero">
+      <div>
+        <span class="badge b-booked">Rosengarten booked core</span>
+        <h1>Rosengarten / Catinaccio · June 2026</h1>
+        <p>Focused command center for travel, hut nights, weather windows, gear and the two remaining booking decisions.</p>
+        <div class="meta">
+          <span class="metric">Window <strong>21-27 June</strong></span>
+          <span class="metric">Walking days <strong>22-26 June</strong></span>
+          <span class="metric">High point <strong>2734m</strong></span>
+          <span class="metric">Style <strong>hut-to-hut</strong></span>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <span class="badge b-fixed">Current plan</span>
+      <h3>Next actions</h3>
+      <div class="action-list">
+        <div class="action-item">
+          <span class="status requested">Open</span>
+          <div><strong>22 June hut</strong><p>Prefer Grasleitenhütte if they reply yes; Schlernhaus stays the scenic but harder option.</p></div>
+        </div>
+        <div class="action-item">
+          <span class="status todo">Pay</span>
+          <div><strong>Rotwandhütte deposit</strong><p>24 June dormitory space confirmed; send written confirmation and pay EUR 22 within 2 days.</p></div>
+        </div>
+        <div class="action-item">
+          <span class="status todo">Pay</span>
+          <div><strong>Other balances</strong><p>Santner EUR 50 deposit still needed; Tierser has EUR 30 remaining at the hut.</p></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section>
+    <div class="plan-head">
+      <h2>Plan</h2>
+      <div class="plan-summary">
+        <span class="plan-pill"><strong>1</strong> hut night open</span>
+        <span class="plan-pill"><strong>4</strong> fixed nights</span>
+        <span class="plan-pill"><strong>EUR 450</strong> cash target</span>
+      </div>
+    </div>
+    <div class="day-grid">
+      <div class="day-card locked">
+        <div class="day-top"><div><div class="day-date">Sun 21</div><div class="day-label">Travel</div></div><span class="status booked">Booked</span></div>
+        <h3>Nightjet to Bolzano</h3>
+        <p class="day-route">Utrecht Sunday evening → Bolzano Monday 11:27.</p>
+        <div class="day-footer"><div><strong>Night</strong>Train</div><div><strong>Cost</strong>Booked</div></div>
+      </div>
+      <div class="day-card">
+        <div class="day-top"><div><div class="day-date">Mon 22</div><div class="day-label">First hut</div></div><span class="status requested">Requested</span></div>
+        <h3>Bolzano → first hut</h3>
+        <p class="day-route">Grasleitenhütte is tactically best. Schlernhaus is scenic but makes Tuesday harder.</p>
+        <div class="day-footer"><div><strong>Night</strong>Grasleiten or Schlernhaus</div><div><strong>Cost</strong>~EUR 60</div></div>
+      </div>
+      <div class="day-card crux">
+        <div class="day-top"><div><div class="day-date">Tue 23</div><div class="day-label">Crux</div></div><span class="status booked">Booked</span></div>
+        <h3>Santnerpasshütte</h3>
+        <p class="day-route">Serious day with via ferrata/cabled terrain and weather exposure. Start early.</p>
+        <div class="day-footer"><div><strong>Night</strong>Santnerpass</div><div><strong>Cost</strong>EUR 105; deposit due</div></div>
+      </div>
+      <div class="day-card locked">
+        <div class="day-top"><div><div class="day-date">Wed 24</div><div class="day-label">Confirmed</div></div><span class="status booked">Booked</span></div>
+        <h3>Rotwandhütte</h3>
+        <p class="day-route">Dormitory space confirmed. Finalize with written confirmation and EUR 22 deposit.</p>
+        <div class="day-footer"><div><strong>Night</strong>Roda di Vael</div><div><strong>Cost</strong>EUR 58 member / EUR 80 nonmember</div></div>
+      </div>
+      <div class="day-card locked">
+        <div class="day-top"><div><div class="day-date">Thu 25</div><div class="day-label">Fixed</div></div><span class="status booked">Booked</span></div>
+        <h3>Tierser Alpl</h3>
+        <p class="day-route">Final high hut night set up for a sane Friday descent to Bolzano.</p>
+        <div class="day-footer"><div><strong>Night</strong>Tierser Alpl</div><div><strong>Cost</strong>EUR 99; EUR 30 due</div></div>
+      </div>
+      <div class="day-card locked">
+        <div class="day-top"><div><div class="day-date">Fri 26</div><div class="day-label">Exit</div></div><span class="status booked">Booked</span></div>
+        <h3>Descend + Nightjet</h3>
+        <p class="day-route">Protect the train. Aim for Bolzano by mid/late afternoon, not evening.</p>
+        <div class="day-footer"><div><strong>Night</strong>Train to Utrecht</div><div><strong>Cost</strong>Booked</div></div>
+      </div>
+    </div>
+    <div class="decision-strip">
+      <div class="decision-card">
+        <span class="status requested">Open</span>
+        <h3>22 June rule</h3>
+        <p><strong>Choose Grasleitenhütte</strong> if available. It makes the Santnerpass day cleaner and less improvised.</p>
+      </div>
+      <div class="decision-card">
+        <span class="status booked">Booked</span>
+        <h3>24 June locked</h3>
+        <p><strong>Rotwandhütte</strong> is the night now. Deposit: EUR 22; check-in from 14:30 and arrive by 18:00.</p>
+      </div>
+      <div class="decision-card">
+        <span class="status todo">Watch</span>
+        <h3>Crux rule</h3>
+        <p>If thunder risk starts early or snow remains on Santnerpass, lower the plan before committing.</p>
+      </div>
+    </div>
+    <details>
+      <summary>Full cost and status table</summary>
+      <div class="week-schedule">
+        <table>
+          <tr><th>Date</th><th>Plan</th><th>Night</th><th>Status</th><th>Cost</th><th>Next</th></tr>
+          <tr><td><strong>Sun 21 Jun</strong></td><td>Nightjet from Utrecht toward Bolzano.</td><td>Nightjet</td><td><span class="status booked">Booked</span></td><td>Booked ticket</td><td>Ticket saved</td></tr>
+          <tr><td><strong>Mon 22 Jun</strong></td><td>Arrive Bolzano 11:27 → transfer to trailhead → first hut.</td><td>Schlernhaus <em>or</em> Grasleitenhütte</td><td><span class="status requested">Requested</span></td><td>~EUR 60 est.</td><td>Await replies</td></tr>
+          <tr class="crux-row"><td><strong>Tue 23 Jun</strong></td><td>First hut → Rosengarten core → Santnerpasshütte. Crux day.</td><td>Santnerpasshütte / Rifugio Passo Santner</td><td><span class="status booked">Booked</span></td><td>EUR 105</td><td>Pay deposit</td></tr>
+          <tr><td><strong>Wed 24 Jun</strong></td><td>Descend from Santnerpass; continue to Rotwandhütte depending on weather and legs.</td><td>Rotwandhütte / Rifugio Roda di Vael</td><td><span class="status booked">Booked</span></td><td>Half-board EUR 58 member / EUR 80 nonmember; EUR 22 deposit due</td><td>Send written confirmation + deposit</td></tr>
+          <tr><td><strong>Thu 25 Jun</strong></td><td>Final hut night positioned for an easy Friday descent to Bolzano.</td><td><strong>Tierser Alpl / Rifugio Alpe di Tires</strong></td><td><span class="status booked">Booked</span></td><td>EUR 99 half-board; EUR 69 paid</td><td>EUR 30 due</td></tr>
+          <tr><td><strong>Fri 26 Jun</strong></td><td>Descend to Seiser Alm / Seis / Bolzano with a large buffer.</td><td>Nightjet from Bolzano to Utrecht</td><td><span class="status booked">Booked</span></td><td>Booked ticket</td><td>Big buffer</td></tr>
+          <tr><td><strong>Sat 27 Jun</strong></td><td>Arrive Utrecht.</td><td>Home</td><td><span class="status travel">Arrive</span></td><td>-</td><td>Recovery day</td></tr>
+        </table>
+      </div>
+    </details>
+    <details>
+      <summary>Rotwandhütte 24 June booking details</summary>
+      <div class="table-scroll">
+        <table>
+          <tr><th>Item</th><th>Details</th></tr>
+          <tr><td>Status</td><td>Dormitory space available for 24 June. Finalize with written confirmation and EUR 22 deposit within 2 days.</td></tr>
+          <tr><td>Half-board</td><td>EUR 58 for CAI/DAV/OeAV/CAS/NKBV members; EUR 80 for non-members.</td></tr>
+          <tr><td>Sleeping + breakfast</td><td>EUR 34 member; EUR 56.50 non-member.</td></tr>
+          <tr><td>Deposit payment</td><td>Credit-card link after confirmation, Satispay, or bank transfer to Silva Srl, FPB Cassa di Fassa Primiero Belluno, IBAN: IT 70 J 08140 05725 000004171310. Reason: name and booking date.</td></tr>
+          <tr><td>Hut rules</td><td>Check-in from 14:30; arrive by 18:00 or notify them. Quiet from 22:00. Vacate room by 09:00.</td></tr>
+          <tr><td>Bring</td><td>Sleeping liner required. Bring slippers and personal hygiene items. They do not rent via ferrata equipment.</td></tr>
+          <tr><td>Note</td><td>The hut has one dog and two cats.</td></tr>
+        </table>
+      </div>
+    </details>
+  </section>
+
+  <section>
+    <h2>Hut Data</h2>
+    <p class="sub">Static booking facts plus optional live Google Places photos, ratings, review snippets, websites and map links. Uses the same local API key as the older planner.</p>
+    <div class="hut-toolbar">
+      <input type="password" id="gApiKey" placeholder="Google Places API key, if not already saved">
+      <button class="btn" type="button" onclick="saveApiKey()">Load Google data</button>
+      <button class="btn secondary" type="button" onclick="clearApiKey()">Clear key</button>
+      <span id="apiKeyStatusText" class="api-status">Fallback data loaded. Add a Google key for live details.</span>
+    </div>
+    <div id="hutIntel" class="hut-intel-grid"></div>
+  </section>
+
+  <section>
+    <h2>Passes + Snow</h2>
+    <p class="sub">Observed station snow first, then modelled pass/peak snow in cm. Stations are real measurements near the route; pass and peak values are model proxies because there are no sensors on every col. Always ask the hut about the exact trail condition.</p>
+    <div id="snowStatus" class="wx-loading">Loading pass and peak snow depths...</div>
+    <div id="snowVisual" class="snow-visual"></div>
+  </section>
+
+  <section>
+    <h2>Mountain Weather</h2>
+    <p class="sub">Live Open-Meteo forecast at booked/pending hut elevations. Monday shows both first-night options. Planning signal only: not an avalanche, snowpack, or route-condition report.</p>
+    <div id="weatherStatus" class="wx-loading">Loading mountain forecast...</div>
+    <div id="weatherVisual" class="weather-visual"></div>
+  </section>
+
+  <section>
+    <h2>Safety: Solo Via Ferrata + Snow</h2>
+    <p class="sub">Gear assumed: helmet, harness, certified via ferrata lanyard, gloves, Hike 900 microspikes, hiking poles, Osprey Stratos 24L. Not assumed: rope, ice axe, crampons, partner rescue, or guided belay.</p>
+    <div class="safety-grid">
+      <div class="safety-card go">
+        <span class="status booked">Solo OK only if</span>
+        <h3>Dry, early, reversible</h3>
+        <p>Stable morning weather, no thunder signal before you are off exposed ground, dry rock/cables, no continuous hard snow on steep terrain, and you feel calm using the ferrata kit.</p>
+      </div>
+      <div class="safety-card caution">
+        <span class="status requested">High caution</span>
+        <h3>Your real limit</h3>
+        <p>Microspikes help on short low-angle snow or icy hut paths. They are not a substitute for crampons/ice axe on steep, hard, exposed snow where a slide would be serious.</p>
+      </div>
+      <div class="safety-card stop">
+        <span class="status todo">Do not solo</span>
+        <h3>Turnaround triggers</h3>
+        <p>Thunder risk building, wet cables, buried cable/steps, hard snow on exposed traverses, fresh snow, poor visibility, loose rockfall activity, or you feel rushed by the train/hut timing.</p>
+      </div>
+    </div>
+    <div class="safety-table">
+      <table>
+        <tr><th>Section</th><th>Solo call</th><th>How to act</th><th>Turn back / reroute if</th></tr>
+        <tr>
+          <td><strong>Before each hut start</strong></td>
+          <td>Decision point</td>
+          <td>Ask hut staff about Santnerpass, Cigolade/Coronelle/Molignon and shaded snow. Put helmet on before rockfall terrain. Tell the hut your route and expected arrival hut.</td>
+          <td>Hut says cable is snow-covered, thunder is likely, or you would reach exposed ground after midday.</td>
+        </tr>
+        <tr>
+          <td><strong>Snow patches on trail</strong></td>
+          <td>Solo OK only on low consequence terrain</td>
+          <td>Stop before the patch, assess runout, put microspikes on before stepping onto firm snow, cross one deliberate step at a time, poles short. Face in and kick steps only on very short benign patches.</td>
+          <td>The snow is hard/icy, angled toward rocks/cliffs, longer than a short crossing, or you cannot see a safe runout. Microspikes are not enough there.</td>
+        </tr>
+        <tr>
+          <td><strong>Via ferrata / cabled sections</strong></td>
+          <td>Not ideal alone, acceptable only if dry and easy for you</td>
+          <td>Harness snug above hips, lanyard girth-hitched to belay loop, helmet clipped, gloves on. Keep at least one carabiner clipped at all times; move only one carabiner at anchors; one person between anchors.</td>
+          <td>Rain starts, rock is wet, cable is loose/damaged/buried, you are shaking/tired, or you need to rush. After any fall on the lanyard, stop and get to safety; do not continue casually.</td>
+        </tr>
+        <tr>
+          <td><strong>Tue 23: first hut → Santnerpasshütte</strong></td>
+          <td>Crux: solo only with a big margin</td>
+          <td>Start very early. Prefer the cleaner line if Monday is Grasleitenhütte. Be off the exposed Santner terrain before afternoon convection. Keep food/water accessible; helmet before gullies.</td>
+          <td>Observed snow is rising, Santner hut reports snow/ice on the approach, thunder risk starts early, or you arrive below the hard section later than planned. Choose lower route/retreat.</td>
+        </tr>
+        <tr>
+          <td><strong>Wed 24: Santnerpass → Rotwandhütte</strong></td>
+          <td>Manage fatigue after crux</td>
+          <td>Move slowly on the descent while legs are tired. Keep helmet on below towers and gullies. If choosing a high connector, re-check Cigolade/Coronelle snow before committing.</td>
+          <td>Visibility drops, rock is wet, or snow remains on the connector. Use a lower descent/transfer logic rather than forcing a scenic high line.</td>
+        </tr>
+        <tr>
+          <td><strong>Thu 25: Rotwandhütte → Tierser Alpl</strong></td>
+          <td>Condition-dependent</td>
+          <td>Use the morning window. Check Molignon/Cigolade/Coronelle reports. If snow is present, choose the least exposed marked route, even if longer.</td>
+          <td>Thunder risk begins before you can clear high passes, or snow is hard on a traverse. Take a lower option or ask hut staff for the safest marked route that day.</td>
+        </tr>
+        <tr>
+          <td><strong>Thunder near cables/ridges</strong></td>
+          <td>No-go if forecast before/while exposed</td>
+          <td>Do not start a ferrata with thunder risk. If caught in fall terrain, stay secured while moving carefully to safer ground; do not unclip both carabiners. Once off fall terrain, get away from ridges/cables and wait low.</td>
+          <td>You hear thunder, see fast vertical cloud build-up, gust fronts, hail/sleet, or hair/metal static signs. Retreat immediately if still possible.</td>
+        </tr>
+      </table>
+    </div>
+    <p class="small"><strong>Bottom line:</strong> with your gear, solo is reasonable for normal hut hiking and short benign snow patches. Solo on Santner/via ferrata terrain is a high-consequence choice: do it only in dry, stable, early conditions with positive hut reports. If conditions are mixed, pair up, hire a guide, or take the lower route.</p>
+  </section>
+
+  <details>
+    <summary>Map</summary>
+    <p class="sub">Red = cleaner Grasleitenhütte first-night line. Gold dashed = Schlernhaus branch and lower Rotwand backup.</p>
+    <div id="map"></div>
+  </details>
+
+  <section>
+    <h2>Essentials</h2>
+    <div class="compact-grid">
+      <div class="focus-card">
+        <h3>Route crux</h3>
+        <p><strong>Tuesday to Santnerpasshütte</strong> is the serious day. If 22 June is Grasleitenhütte it is much cleaner; if it is Schlernhaus, start very early and treat the whole day as committing.</p>
+      </div>
+      <div class="focus-card">
+        <h3>Friday rule</h3>
+        <p>Friday is logistics, not adventure. Descend early and aim to be in <strong>Bolzano by mid/late afternoon</strong> for the Nightjet.</p>
+      </div>
+      <div class="focus-card">
+        <h3>Backpack</h3>
+        <p><strong>Osprey Stratos 24L can work</strong>, but it is tight with helmet, harness, ferrata set and microspikes. Pack hut-minimal and carry the helmet outside the pack, strapped tight rather than dangling.</p>
+      </div>
+      <div class="focus-card">
+        <h3>Cash</h3>
+        <p>Carry <strong>EUR 450 cash</strong>. Minimum workable: EUR 350. Comfortable with lunches, beers/drinks and hut-card failures: EUR 450-500.</p>
+      </div>
+      <div class="focus-card">
+        <h3>Phone copy</h3>
+        <p>AirDrop or iCloud Drive this HTML to your iPhone and open it in Safari/Files. Core plan, safety, hut facts, cash and packing list stay readable; live weather, snow, Google hut data and map tiles need internet.</p>
+      </div>
+    </div>
+    <details>
+      <summary>Cash calculation</summary>
+      <div class="table-scroll">
+        <table>
+          <tr><th>Bucket</th><th>Estimate</th><th>Notes</th></tr>
+          <tr><td>Remaining hut balances</td><td>~EUR 180-205</td><td>22 Jun ~60, Santner remaining ~55 after deposit, Rotwand remaining EUR 36 member / EUR 58 nonmember after deposit, Tierser remaining EUR 30.</td></tr>
+          <tr><td>Lunches / snacks</td><td>~EUR 70</td><td>4-5 hut lunches or packed lunches at EUR 12-15.</td></tr>
+          <tr><td>Beers + drinks</td><td>~EUR 60</td><td>One or two drinks per hut night, plus coffee/soft drinks.</td></tr>
+          <tr><td>Showers / coins</td><td>~EUR 15</td><td>Coin showers and small hut extras.</td></tr>
+          <tr><td>Local transport / lift margin</td><td>~EUR 40</td><td>Buses/lift/taxi-ish buffer if cards fail.</td></tr>
+          <tr><td>Emergency buffer</td><td>~EUR 55</td><td>Enough slack without carrying a silly amount.</td></tr>
+          <tr><td><strong>Total</strong></td><td><strong>EUR 450</strong></td><td>Bring mixed notes: 5/10/20/50.</td></tr>
+        </table>
+      </div>
+    </details>
+  </section>
+
+  <details>
+    <summary>Packing list</summary>
+    <div class="card">
+      <h3>Decathlon pickup</h3>
+      <p class="small"><strong>Ordered for pickup from 21 June 2026.</strong> Total order: <strong>EUR 335.93</strong>. You are using the Osprey Stratos 24L with its built-in rain cover, so keep everything compact and try the fit of helmet, harness and microspikes before leaving Decathlon.</p>
+      <div class="table-scroll">
+        <table>
+          <tr><th>Status</th><th>Item</th><th>Link</th><th>Price</th><th>Size / note</th></tr>
+          <tr>
+            <td><span class="status ordered">Ordered</span></td>
+            <td>Microspikes / hiking crampons</td>
+            <td><a href="https://www.decathlon.nl/p/wandelstijgijzers-hike-900-zwart/312581/m8926358" target="_blank">QUECHUA Hike 900 zwart</a></td>
+            <td>EUR 34.99</td>
+            <td>Size S. Fit-check on your actual hiking shoes before leaving the store.</td>
+          </tr>
+          <tr>
+            <td><span class="status ordered">Ordered</span></td>
+            <td>Via ferrata lanyard</td>
+            <td><a href="https://www.decathlon.nl/p/set-voor-via-ferrata-vitalink-tweekleurig-4-0/339929/m8853792" target="_blank">SIMOND Vitalink 4.0</a></td>
+            <td>EUR 72.99</td>
+            <td>No size. Inspect carabiner auto-close/action before the trip.</td>
+          </tr>
+          <tr>
+            <td><span class="status ordered">Ordered</span></td>
+            <td>Climbing harness</td>
+            <td><a href="https://www.decathlon.nl/p/klimgordel-klimb-zwart/350103/c382c382c382m8830117" target="_blank">SIMOND Klimb harness</a></td>
+            <td>EUR 49.99</td>
+            <td>L/XL/2XL. Try with hiking trousers and midlayer.</td>
+          </tr>
+          <tr>
+            <td><span class="status ordered">Ordered</span></td>
+            <td>Helmet</td>
+            <td><a href="https://www.decathlon.nl/p/helm-voor-klimmen-en-bergsport-edge-turquoise/328135/c340m8602703" target="_blank">SIMOND Edge helmet</a></td>
+            <td>EUR 62.99</td>
+            <td>M / 55-59 cm. Check it sits low and stable, with no pressure points.</td>
+          </tr>
+          <tr>
+            <td><span class="status ordered">Ordered</span></td>
+            <td>Via ferrata gloves</td>
+            <td><a href="https://www.decathlon.nl/p/via-ferrata-handschoenen-crag/387678/m9036651" target="_blank">Crag via ferrata gloves</a></td>
+            <td>EUR 19.99</td>
+            <td>Size L. Useful for steel cable and rough limestone.</td>
+          </tr>
+          <tr>
+            <td><span class="status ordered">Ordered</span></td>
+            <td>Sleeping liner / lakenzak</td>
+            <td><a href="https://www.decathlon.nl/p/lakenzak-100percent-zijde-voor-trekkingslaapzak-mt500/323651/c227m8578334" target="_blank">FORCLAZ MT500 silk liner</a></td>
+            <td>EUR 44.99</td>
+            <td>No size, snow white. Compact choice for the 24L pack.</td>
+          </tr>
+          <tr>
+            <td><span class="status ordered">Ordered</span></td>
+            <td>Convertible hiking trousers</td>
+            <td><a href="https://www.decathlon.nl/p/2-in-1-broek-voor-backpacken-trek-900-heren-afritsbaar/311160/c71m8930747" target="_blank">SIMOND Trek 900 2-in-1</a></td>
+            <td>EUR 49.99</td>
+            <td>L / NL 50, L34, carbon grey. This is your main trail trouser.</td>
+          </tr>
+        </table>
+      </div>
+      <p class="small"><strong>Pickup check:</strong> wear/bring your hiking shoes if possible for the Hike 900 size S fit. For the helmet, shake your head gently with the chin strap fastened; it should stay put without being painfully tight.</p>
+    </div>
+    <div class="card">
+      <h3>Pack setup</h3>
+      <p class="small"><strong>Helmet:</strong> use a helmet holder/net if you have one. Otherwise clip the chin strap around the top grab handle or a solid gear loop, then use the side compression straps to hold the helmet body tight against the outside/front of the Stratos. Add a small carabiner through a helmet vent as backup. It should not swing, hit your legs/head, or block access to water or rain gear.</p>
+    </div>
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>Mountain safety</h3>
+        <ul class="checklist">
+          <li><input type="checkbox">Helmet - ordered, pick up 21 June</li>
+          <li><input type="checkbox">Via-ferrata lanyard - ordered, pick up 21 June</li>
+          <li><input type="checkbox">Climbing harness - ordered, pick up 21 June</li>
+          <li><input type="checkbox">Microspikes / hiking crampons - ordered, size-check on hiking shoes</li>
+          <li><input type="checkbox">Via ferrata gloves - ordered, pick up 21 June</li>
+          <li><input type="checkbox">Headlamp + spare battery/charge</li>
+          <li><input type="checkbox">First-aid kit + blister kit</li>
+          <li><input type="checkbox">Emergency bivy / survival blanket</li>
+          <li><input type="checkbox">Whistle</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Clothing</h3>
+        <ul class="checklist">
+          <li><input type="checkbox">1 waterproof jacket</li>
+          <li><input type="checkbox">1 waterproof trousers or rain skirt</li>
+          <li><input type="checkbox">1 insulation layer / light down</li>
+          <li><input type="checkbox">1 fleece or active midlayer</li>
+          <li><input type="checkbox">2 hiking shirts / base layers: wear 1, pack 1</li>
+          <li><input type="checkbox">1 convertible hiking trousers: ordered, wear on trail</li>
+          <li><input type="checkbox">1 light hut/sleep trousers or shorts</li>
+          <li><input type="checkbox">3 underwear: wear 1, pack 2</li>
+          <li><input type="checkbox">3 hiking socks: wear 1, pack 2</li>
+          <li><input type="checkbox">1 warm hat + 1 sun cap</li>
+          <li><input type="checkbox">1 pair light gloves</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Hut nights</h3>
+        <ul class="checklist">
+          <li><input type="checkbox">Sleeping liner - ordered, pick up 21 June</li>
+          <li><input type="checkbox">Earplugs</li>
+          <li><input type="checkbox">Small towel</li>
+          <li><input type="checkbox">Toothbrush + tiny toiletries</li>
+          <li><input type="checkbox">EUR 450 cash + bank card</li>
+          <li><input type="checkbox">Light hut clothes / sleep layer</li>
+          <li><input type="checkbox">Plastic bag for wet gear</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Navigation + admin</h3>
+        <ul class="checklist">
+          <li><input type="checkbox">Phone with offline maps</li>
+          <li><input type="checkbox">Garmin/Fenix loaded with route</li>
+          <li><input type="checkbox">Power bank + cables</li>
+          <li><input type="checkbox">Tabacco 029 map</li>
+          <li><input type="checkbox">Nightjet tickets offline</li>
+          <li><input type="checkbox">Hut confirmations offline</li>
+          <li><input type="checkbox">ID/passport + insurance details</li>
+          <li><input type="checkbox">Sunglasses + sunscreen</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+
+  <details>
+    <summary>Pre-departure checklist</summary>
+    <div class="grid grid-2">
+      <div class="card">
+        <h3>Bookings</h3>
+        <ul class="checklist">
+          <li><input type="checkbox">Confirm/pay Santnerpasshütte deposit and save written confirmation.</li>
+          <li><input type="checkbox">Confirm Monday 22 June: Schlernhaus or Grasleitenhütte.</li>
+          <li><input type="checkbox">Send written confirmation and pay EUR 22 Rotwandhütte deposit for Wednesday 24 June.</li>
+          <li><input type="checkbox">Save Tierser Alpl 25 June confirmation and note EUR 30 remaining balance.</li>
+          <li><input type="checkbox">Save Nightjet tickets offline and as print/PDF backup.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Safety</h3>
+        <ul class="checklist">
+          <li><input type="checkbox">Tabacco 029 checked for both first-night variants to Santnerpass.</li>
+          <li><input type="checkbox">Helmet and via-ferrata set packed for Santnerpass variant.</li>
+          <li><input type="checkbox">Microspikes packed if late-June snow remains on high/N-facing sections.</li>
+          <li><input type="checkbox">Weather and hut route conditions checked 3-5 days before departure and again locally.</li>
+          <li><input type="checkbox">Friday Bolzano return buffer protected.</li>
+        </ul>
+      </div>
+    </div>
+  </details>
+</div>
+
+<script>
+const points = [
+  { name: "Bolzano / Bozen Hbf", lat: 46.4983, lng: 11.3548, type: "station" },
+  { name: "Seiser Alm / Compatsch access", lat: 46.5419, lng: 11.6170, type: "access" },
+  { name: "Schlernhaus / Rifugio Bolzano", lat: 46.5170, lng: 11.5650, type: "hut" },
+  { name: "Grasleitenhütte / Rifugio Bergamo", lat: 46.4730, lng: 11.6500, type: "option" },
+  { name: "Tierser Alpl", lat: 46.5025, lng: 11.6280, type: "hut" },
+  { name: "Grasleitenpass / Passo Principe", lat: 46.4720, lng: 11.6350, type: "pass" },
+  { name: "Passo Santner", lat: 46.4555, lng: 11.6280, type: "pass" },
+  { name: "Passo delle Coronelle / Tschagerjoch", lat: 46.4480, lng: 11.6100, type: "pass" },
+  { name: "Passo delle Cigolade", lat: 46.4320, lng: 11.6200, type: "pass" },
+  { name: "Passo di Molignon", lat: 46.4970, lng: 11.6350, type: "pass" },
+  { name: "Sas de Scalieret / Cima Scalieret", lat: 46.46336, lng: 11.64445, type: "peak" },
+  { name: "Rifugio Vajolet", lat: 46.4628, lng: 11.6300, type: "hut" },
+  { name: "Rifugio Re Alberto", lat: 46.4665, lng: 11.6350, type: "hut" },
+  { name: "Santnerpasshütte / Rifugio Passo Santner", lat: 46.4555, lng: 11.6280, type: "booked" },
+  { name: "Rifugio Antermoia", lat: 46.4900, lng: 11.6450, type: "option" },
+  { name: "Rotwandhütte / Rifugio Roda di Vael", lat: 46.4145, lng: 11.5970, type: "booked" },
+  { name: "Tierser Alpl / exit side", lat: 46.5025, lng: 11.6280, type: "hut" },
+  { name: "Bolzano return", lat: 46.4983, lng: 11.3548, type: "station" }
+];
+
+const weatherVisualStops = [
+  { date: "2026-06-22", label: "Mon 22", route: "Bolzano → first hut", name: "Schlernhaus option", lat: 46.5170, lng: 11.5650, elev: 2457 },
+  { date: "2026-06-22", label: "Mon 22", route: "Bolzano → first hut", name: "Grasleitenhütte option", lat: 46.4730, lng: 11.6500, elev: 2134 },
+  { date: "2026-06-23", label: "Tue 23", route: "First hut → Santnerpasshütte", name: "Santnerpasshütte", lat: 46.4555, lng: 11.6280, elev: 2734 },
+  { date: "2026-06-24", label: "Wed 24", route: "Santner → Rotwandhütte", name: "Rotwandhütte / Roda di Vael", lat: 46.4145, lng: 11.5970, elev: 2283 },
+  { date: "2026-06-25", label: "Thu 25", route: "24 Jun hut → Tierser Alpl", name: "Tierser Alpl", lat: 46.5025, lng: 11.6280, elev: 2440 },
+  { date: "2026-06-26", label: "Fri 26", route: "Tierser Alpl → Bolzano", name: "Seiser Alm descent", lat: 46.5419, lng: 11.6170, elev: 2100 }
+];
+
+const snowTerrainPoints = [
+  { name: "Passo Santner", role: "Tue 23 crux / hut", day: "Tue 23", lat: 46.4555, lng: 11.6280, elev: 2734, exposure: "North-facing gullies and ferrata terrain nearby." },
+  { name: "Passo Principe / Grasleitenpass", role: "High connector option", day: "Route dependent", lat: 46.4720, lng: 11.6350, elev: 2599, exposure: "Important if routing through Vajolet / Principe." },
+  { name: "Passo delle Coronelle / Tschagerjoch", role: "Rosengarten traverse pass", day: "Route dependent", lat: 46.4480, lng: 11.6100, elev: 2630, exposure: "Can hold old snow on shaded approaches." },
+  { name: "Passo delle Cigolade", role: "Roda di Vael connector", day: "Wed/Thu option", lat: 46.4320, lng: 11.6200, elev: 2553, exposure: "Likely relevant around Rotwandhütte routing." },
+  { name: "Passo di Molignon", role: "Tierser Alpl approach", day: "Thu 25", lat: 46.4970, lng: 11.6350, elev: 2598, exposure: "High pass near Tierser Alpl; check if crossing late." },
+  { name: "Passo di Antermoia", role: "High backup route", day: "Backup", lat: 46.4870, lng: 11.6640, elev: 2770, exposure: "High and more snow-sensitive; keep as backup intel." },
+  { name: "Sas de Scalieret / Cima Scalieret", role: "Nearby peak snow proxy", day: "Optional / context", lat: 46.46336, lng: 11.64445, elev: 2887, exposure: "Peak proxy above Vajolet/Principe; useful for high-snow signal." }
+];
+
+const observedSnowStations = [
+  { sensorCode: "78110MS", name: "Karerpass / Passo Costalunga", elev: 1715, km: 5.8, role: "Closest observed snow station to Roda di Vael / south-west Rosengarten." },
+  { sensorCode: "74200MS", name: "Seiser Alm Zallinger", elev: 2055, km: 7.8, role: "Closest observed station on the Seiser Alm / Schlern-Tierser side." },
+  { sensorCode: "78480SF", name: "Obereggen", elev: 2125, km: 12.1, role: "Nearby higher observed comparison station in the Latemar/Eggental side." }
+];
+
+const weatherCodeText = {
+  0: "Clear", 1: "Mostly clear", 2: "Partly cloudy", 3: "Cloudy",
+  45: "Fog", 48: "Rime fog",
+  51: "Light drizzle", 53: "Drizzle", 55: "Heavy drizzle",
+  61: "Light rain", 63: "Rain", 65: "Heavy rain",
+  66: "Freezing rain", 67: "Heavy freezing rain",
+  71: "Light snow", 73: "Snow", 75: "Heavy snow",
+  77: "Snow grains",
+  80: "Rain showers", 81: "Showers", 82: "Heavy showers",
+  85: "Snow showers", 86: "Heavy snow showers",
+  95: "Thunderstorm", 96: "Thunderstorm + hail", 99: "Severe thunderstorm"
+};
+
+const hutData = [
+  {
+    key: "bergamoH",
+    name: "Grasleitenhütte / Rifugio Bergamo",
+    role: "Preferred first night",
+    status: "Requested",
+    date: "Mon 22",
+    elev: 2134,
+    lat: 46.4730,
+    lng: 11.6500,
+    cost: "~EUR 60 est.",
+    phone: "+39 0471 1632320",
+    website: "https://www.grasleitenhuette.com/en.html",
+    query: "Rifugio Bergamo Grasleitenhütte",
+    fallback: { rating: 4.4, count: 85, source: "researched fallback", snippet: "Best tactical first night for the Santnerpass day: lower, closer, and cleaner than Schlernhaus." }
+  },
+  {
+    key: "schlernhaus",
+    name: "Schlernhaus / Rifugio Bolzano",
+    role: "Scenic first-night backup",
+    status: "Requested",
+    date: "Mon 22",
+    elev: 2457,
+    lat: 46.5170,
+    lng: 11.5650,
+    cost: "~EUR 60 est.",
+    phone: "+39 0471 612024",
+    website: "https://www.schlernhaus.it/en",
+    query: "Rifugio Bolzano Schlernhaus",
+    fallback: { rating: 4.5, count: 230, source: "researched fallback", snippet: "Classic Schlern plateau hut. Beautiful start, but it makes Tuesday to Santnerpass more committing." }
+  },
+  {
+    key: "santner",
+    name: "Santnerpasshütte / Rifugio Passo Santner",
+    role: "Crux night",
+    status: "Booked",
+    date: "Tue 23",
+    elev: 2734,
+    lat: 46.4555,
+    lng: 11.6280,
+    cost: "EUR 105; EUR 50 deposit due",
+    phone: "info@santnerpass.com",
+    website: "mailto:info@santnerpass.com",
+    query: "Santnerpasshütte Rifugio Passo Santner",
+    fallback: { rating: 4.8, count: 40, source: "booking email + fallback", snippet: "Booked bed in shared room. Includes vegetarian 4-course dinner and breakfast; deposit confirms the reservation." }
+  },
+  {
+    key: "antermoia",
+    name: "Rifugio Antermoia",
+    role: "24 June backup",
+    status: "Requested",
+    date: "Wed 24",
+    elev: 2497,
+    lat: 46.4900,
+    lng: 11.6450,
+    cost: "~EUR 65 est.",
+    phone: "+39 333 1407402",
+    website: "https://www.rifugioantermoia.com/",
+    query: "Rifugio Antermoia Catinaccio",
+    fallback: { rating: 4.6, count: 120, source: "researched fallback", snippet: "Good high-route option, but no longer the active night now that Rotwandhütte has space." }
+  },
+  {
+    key: "rodaVael",
+    name: "Rotwandhütte / Rifugio Roda di Vael",
+    role: "Booked 24 June",
+    status: "Booked",
+    date: "Wed 24",
+    elev: 2283,
+    lat: 46.4145,
+    lng: 11.5970,
+    cost: "EUR 58 member / EUR 80 nonmember; EUR 22 deposit due",
+    phone: "+39 0462 764450",
+    website: "https://www.rodadivael.it/en/",
+    query: "Rifugio Roda di Vael",
+    fallback: { rating: 4.5, count: 95, source: "booking email + fallback", snippet: "Dormitory space confirmed for 24 June. Check-in from 14:30, arrive by 18:00, quiet from 22:00, vacate room by 09:00. Sleeping liner required; bring slippers and hygiene items. No via ferrata equipment rental." }
+  },
+  {
+    key: "tierserAlpl",
+    name: "Tierser Alpl / Rifugio Alpe di Tires",
+    role: "Final hut night",
+    status: "Booked",
+    date: "Thu 25",
+    elev: 2440,
+    lat: 46.5025,
+    lng: 11.6280,
+    cost: "EUR 99; EUR 69 paid; EUR 30 due",
+    phone: "+39 0471 727958",
+    website: "https://www.tierseralpl.com/en/",
+    query: "Tierser Alpl Rifugio Alpe di Tires",
+    fallback: { rating: 4.7, count: 480, source: "researched fallback", snippet: "Booked. Iconic red hut on the pass, excellent final position for Friday's descent." }
+  }
+];
+
+let googleApiKey = localStorage.getItem("hiken_gapi_key") || "";
+const PLACES_API_BASE = "https://places.googleapis.com/v1";
+
+function escapeHTML(value = "") {
+  return String(value).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[ch]));
+}
+
+function statusClass(label) {
+  if (/booked/i.test(label)) return "booked";
+  if (/requested/i.test(label)) return "requested";
+  return "todo";
+}
+
+function starsFor(rating) {
+  if (!Number.isFinite(rating)) return "";
+  const rounded = Math.round(rating);
+  return "★".repeat(rounded) + "☆".repeat(Math.max(0, 5 - rounded));
+}
+
+function googleMapsLink(hut) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${hut.name} ${hut.elev}m`)}`;
+}
+
+function renderHutCard(hut, live = null) {
+  const rating = live?.rating ?? hut.fallback.rating;
+  const count = live?.count ?? hut.fallback.count;
+  const source = live ? "Google" : hut.fallback.source;
+  const review = live?.reviews?.[0]?.text || hut.fallback.snippet;
+  const reviewAuthor = live?.reviews?.[0]?.author ? ` - ${live.reviews[0].author}` : "";
+  const photo = live?.photos?.[0]?.full || "";
+  const website = live?.website || hut.website;
+  const maps = live?.googleMapsUrl || googleMapsLink(hut);
+  const phone = live?.phone || hut.phone;
+  const photoStyle = photo ? ` style="background-image:url('${photo}')"` : "";
+  return `<article class="hut-intel-card" id="hut-${hut.key}">
+    <div class="hut-photo"${photoStyle}><span class="hut-photo-label">${escapeHTML(hut.date)} · ${escapeHTML(hut.role)}</span></div>
+    <div class="hut-body">
+      <div class="hut-meta-line"><span class="status ${statusClass(hut.status)}">${escapeHTML(hut.status)}</span><span>${hut.elev}m</span></div>
+      <h3>${escapeHTML(hut.name)}</h3>
+      <div class="rating-row">${rating ? `<span class="stars">${starsFor(rating)}</span><strong>${Number(rating).toFixed(1)}</strong><span class="small">(${count || 0} · ${escapeHTML(source)})</span>` : `<span class="small">No rating loaded</span>`}</div>
+      <p class="review-text">${escapeHTML(review)}${escapeHTML(reviewAuthor)}</p>
+      <div class="hut-meta-line"><strong>Cost:</strong><span>${escapeHTML(hut.cost)}</span></div>
+      <div class="hut-meta-line"><strong>Contact:</strong><span>${escapeHTML(phone)}</span></div>
+      <div class="hut-links">
+        ${website ? `<a href="${escapeHTML(website)}" target="_blank">Website/contact</a>` : ""}
+        <a href="${escapeHTML(maps)}" target="_blank">Google Maps</a>
+      </div>
+    </div>
+  </article>`;
+}
+
+function renderHutIntel() {
+  const grid = document.getElementById("hutIntel");
+  if (!grid) return;
+  grid.innerHTML = hutData.map(hut => renderHutCard(hut)).join("");
+}
+
+function updateApiKeyStatus(text, ok = false) {
+  const el = document.getElementById("apiKeyStatusText");
+  if (!el) return;
+  el.textContent = text;
+  el.style.color = ok ? "var(--forest)" : "var(--muted)";
+  el.style.fontWeight = ok ? "700" : "400";
+}
+
+function saveApiKey() {
+  const input = document.getElementById("gApiKey");
+  const key = input?.value.trim();
+  if (!key) {
+    updateApiKeyStatus("Paste a Google Places API key first.");
+    return;
+  }
+  localStorage.setItem("hiken_gapi_key", key);
+  googleApiKey = key;
+  loadGoogleHutData();
+}
+
+function clearApiKey() {
+  localStorage.removeItem("hiken_gapi_key");
+  Object.keys(localStorage)
+    .filter(k => k.startsWith("rosen_place_") || k.startsWith("rosen_details_"))
+    .forEach(k => localStorage.removeItem(k));
+  googleApiKey = "";
+  const input = document.getElementById("gApiKey");
+  if (input) input.value = "";
+  renderHutIntel();
+  updateApiKeyStatus("Google key cleared. Fallback data loaded.");
+}
+
+async function searchPlaceNew(query, lat, lng, radius = 3500) {
+  const cacheKey = `rosen_place_${query.replace(/\W/g, "_")}`;
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) {
+    const obj = JSON.parse(cached);
+    if (Date.now() - obj.ts < 30 * 24 * 60 * 60 * 1000) return obj.data;
+  }
+  const body = {
+    textQuery: query,
+    maxResultCount: 5,
+    locationBias: { circle: { center: { latitude: lat, longitude: lng }, radius } }
+  };
+  const res = await fetch(`${PLACES_API_BASE}/places:searchText`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Goog-Api-Key": googleApiKey,
+      "X-Goog-FieldMask": "places.id,places.displayName,places.location,places.formattedAddress"
+    },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) throw new Error(`Google search HTTP ${res.status}`);
+  const data = await res.json();
+  if (!data.places?.length) return null;
+  const best = data.places.reduce((closest, place) => {
+    const current = haversine(lat, lng, place.location.latitude, place.location.longitude);
+    const previous = haversine(lat, lng, closest.location.latitude, closest.location.longitude);
+    return current < previous ? place : closest;
+  }, data.places[0]);
+  const result = { id: best.id, name: best.displayName?.text, location: best.location };
+  localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: result }));
+  return result;
+}
+
+async function getPlaceDetailsNew(placeId) {
+  const cacheKey = `rosen_details_${placeId}`;
+  const cached = localStorage.getItem(cacheKey);
+  if (cached) {
+    const obj = JSON.parse(cached);
+    if (Date.now() - obj.ts < 7 * 24 * 60 * 60 * 1000) return obj.data;
+  }
+  const res = await fetch(`${PLACES_API_BASE}/places/${placeId}`, {
+    headers: {
+      "X-Goog-Api-Key": googleApiKey,
+      "X-Goog-FieldMask": "displayName,rating,userRatingCount,reviews,photos,websiteUri,googleMapsUri,internationalPhoneNumber"
+    }
+  });
+  if (!res.ok) throw new Error(`Google details HTTP ${res.status}`);
+  const place = await res.json();
+  const data = {
+    name: place.displayName?.text,
+    rating: place.rating,
+    count: place.userRatingCount,
+    phone: place.internationalPhoneNumber,
+    website: place.websiteUri,
+    googleMapsUrl: place.googleMapsUri,
+    reviews: (place.reviews || []).slice(0, 2).map(r => ({
+      author: r.authorAttribution?.displayName || "Google reviewer",
+      rating: r.rating,
+      text: r.text?.text || r.originalText?.text || "",
+      time: r.relativePublishTimeDescription || ""
+    })),
+    photos: (place.photos || []).slice(0, 3).map(p => ({
+      thumb: photoUrlFromName(p.name, 320),
+      full: photoUrlFromName(p.name, 900)
+    }))
+  };
+  localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data }));
+  return data;
+}
+
+function photoUrlFromName(photoName, maxWidth = 800) {
+  return `${PLACES_API_BASE}/${photoName}/media?maxWidthPx=${maxWidth}&key=${googleApiKey}`;
+}
+
+function haversine(lat1, lng1, lat2, lng2) {
+  const R = 6371000;
+  const toRad = x => x * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+async function loadGoogleHutData() {
+  if (!googleApiKey) {
+    updateApiKeyStatus("Fallback data loaded. Add a Google key for live details.");
+    return;
+  }
+  const input = document.getElementById("gApiKey");
+  if (input) input.value = googleApiKey;
+  let loaded = 0;
+  updateApiKeyStatus("Loading Google Places data...");
+  for (const hut of hutData) {
+    try {
+      const place = await searchPlaceNew(hut.query, hut.lat, hut.lng);
+      if (!place) continue;
+      const details = await getPlaceDetailsNew(place.id);
+      if (!details) continue;
+      const card = document.getElementById(`hut-${hut.key}`);
+      if (card) card.outerHTML = renderHutCard(hut, details);
+      loaded += 1;
+      updateApiKeyStatus(`Google Places loaded for ${loaded}/${hutData.length} huts...`, true);
+      await new Promise(resolve => setTimeout(resolve, 80));
+    } catch (err) {
+      console.warn(`Google Places failed for ${hut.name}:`, err);
+    }
+  }
+  updateApiKeyStatus(loaded ? `Google Places live data loaded for ${loaded}/${hutData.length} huts.` : "Google Places could not load. Fallback data remains visible.", Boolean(loaded));
+}
+
+function riskFor(day) {
+  const precip = day.precip ?? 0;
+  const snow = day.snow ?? 0;
+  const wind = day.wind ?? 0;
+  const code = day.code ?? 0;
+  if (code >= 95 || snow >= 2 || precip >= 12 || wind >= 55) return { label: "High", cls: "wx-high" };
+  if (snow > 0 || precip >= 4 || wind >= 35 || [45,48,80,81,85,86].includes(code)) return { label: "Watch", cls: "wx-med" };
+  return { label: "Okay", cls: "wx-low" };
+}
+
+function fmt(n, unit = "") {
+  return Number.isFinite(n) ? `${Math.round(n)}${unit}` : "-";
+}
+
+function snowClass(cm) {
+  if (!Number.isFinite(cm)) return "";
+  if (cm >= 20) return "high";
+  if (cm >= 5) return "watch";
+  return "";
+}
+
+function snowCall(cm, freshCm, elev) {
+  if (!Number.isFinite(cm)) return "No live snow-depth value; ask hut.";
+  if (cm >= 20 || freshCm >= 8) return "Treat as snow route: ask hut and keep microspikes ready.";
+  if (cm >= 5 || freshCm > 0) return "Watch shaded/N-facing sections; microspikes may matter.";
+  if (elev >= 2700) return "Model says low snow, but high shaded gullies still need local check.";
+  return "Low snow signal in the model.";
+}
+
+async function fetchSnowPoint(point) {
+  const params = new URLSearchParams({
+    latitude: point.lat,
+    longitude: point.lng,
+    elevation: point.elev,
+    current: "snow_depth,temperature_2m",
+    daily: "snowfall_sum,temperature_2m_max,temperature_2m_min",
+    timezone: "Europe/Rome",
+    forecast_days: "5"
+  });
+  const res = await fetch(`https://api.open-meteo.com/v1/forecast?${params.toString()}`);
+  if (!res.ok) throw new Error(`Snow HTTP ${res.status}`);
+  const data = await res.json();
+  const depthM = data.current?.snow_depth;
+  const snowCm = Number.isFinite(depthM) ? depthM * 100 : NaN;
+  const freshCm = (data.daily?.snowfall_sum || []).slice(0, 3).reduce((sum, v) => sum + (Number(v) || 0), 0);
+  const tMin = Math.min(...(data.daily?.temperature_2m_min || []).slice(0, 3).filter(Number.isFinite));
+  const tMax = Math.max(...(data.daily?.temperature_2m_max || []).slice(0, 3).filter(Number.isFinite));
+  return { point, snowCm, freshCm, tMin, tMax };
+}
+
+async function fetchObservedSnowStations() {
+  const res = await fetch("https://geoservices.buergernetz.bz.it/services/meteo/v1/sensors?output_format=JSON");
+  if (!res.ok) throw new Error(`Observed snow HTTP ${res.status}`);
+  const sensors = await res.json();
+  return observedSnowStations.map(station => {
+    const sensor = sensors.find(item => item.SCODE === station.sensorCode && item.TYPE === "HS");
+    const raw = Number(sensor?.VALUE);
+    const snowCm = Number.isFinite(raw) ? Math.max(0, raw) : NaN;
+    return {
+      ...station,
+      snowCm,
+      date: sensor?.DATE || "",
+      source: sensor?.DESC_D ? "South Tyrol official station" : "No live value"
+    };
+  });
+}
+
+async function loadTerrainSnow() {
+  const status = document.getElementById("snowStatus");
+  const visual = document.getElementById("snowVisual");
+  if (!status || !visual) return;
+  try {
+    const [observedRows, rows] = await Promise.all([
+      fetchObservedSnowStations(),
+      Promise.all(snowTerrainPoints.map(fetchSnowPoint))
+    ]);
+    visual.innerHTML = `<h3>Observed snow stations</h3>
+    <table>
+      <tr><th>Station</th><th>Why it matters</th><th>Elevation</th><th>Distance</th><th>Measured snow</th><th>Time</th></tr>
+      ${observedRows.map(station => `<tr>
+        <td>${station.name}</td>
+        <td>${station.role}<br><span class="small">${station.source}</span></td>
+        <td>${station.elev}m</td>
+        <td>${station.km}km from route core</td>
+        <td><span class="snow-cm ${snowClass(station.snowCm)}">${Number.isFinite(station.snowCm) ? fmt(station.snowCm, "cm") : "-"}</span></td>
+        <td>${station.date || "-"}</td>
+      </tr>`).join("")}
+    </table>
+    <h3>Modelled passes and peaks</h3>
+    <table>
+      <tr><th>Pass / peak</th><th>Route relevance</th><th>Elevation</th><th>Snow now</th><th>Fresh snow next 3d</th><th>3-day temp</th><th>Call</th></tr>
+      ${rows.map(({ point, snowCm, freshCm, tMin, tMax }) => `<tr>
+        <td>${point.name}<br><span class="small">${point.day}</span></td>
+        <td>${point.role}<br><span class="small">${point.exposure}</span></td>
+        <td>${point.elev}m</td>
+        <td><span class="snow-cm ${snowClass(snowCm)}">${Number.isFinite(snowCm) ? fmt(snowCm, "cm") : "-"}</span></td>
+        <td>${fmt(freshCm, "cm")}</td>
+        <td>${Number.isFinite(tMin) && Number.isFinite(tMax) ? `${fmt(tMin, "°")} / ${fmt(tMax, "°")}` : "-"}</td>
+        <td>${snowCall(snowCm, freshCm, point.elev)}</td>
+      </tr>`).join("")}
+    </table>
+    <p class="small"><strong>Observed</strong> rows are real station snow-height measurements from the South Tyrol official open-data service. <strong>Modelled</strong> rows are Open-Meteo snow depth at the specified pass/peak elevation, converted from metres to cm. Pass coordinates are route-planning proxies; exact trail snow can differ sharply in shaded gullies.</p>`;
+    const worst = rows.reduce((max, r) => Math.max(max, Number.isFinite(r.snowCm) ? r.snowCm : 0), 0);
+    const worstObserved = observedRows.reduce((max, r) => Math.max(max, Number.isFinite(r.snowCm) ? r.snowCm : 0), 0);
+    status.textContent = `Observed stations loaded plus ${rows.length} modelled passes/peaks. Highest observed station: ${fmt(worstObserved, "cm")}; highest modelled pass/peak: ${fmt(worst, "cm")}.`;
+  } catch (err) {
+    status.textContent = "Observed/model snow could not load. Ask Santnerpasshütte, Rotwandhütte and Tierser Alpl for trail conditions.";
+    visual.innerHTML = `<p class="small">Fallback: check official South Tyrol station snow heights, then treat Santnerpass, Passo Principe, Cigolade/Coronelle and Scalieret as snow-sensitive until local hut reports say otherwise.</p>`;
+    console.error(err);
+  }
+}
+
+function thunderWindow(hourly, date) {
+  const sameDay = hourly.time
+    .map((time, i) => ({ time, i, hour: Number(time.slice(11, 13)) }))
+    .filter(h => timeDate(h.time) === date && h.hour >= 8 && h.hour <= 22);
+
+  let first = null;
+  for (const h of sameDay) {
+    const code = hourly.weather_code[h.i] ?? 0;
+    const pop = hourly.precipitation_probability[h.i] ?? 0;
+    const rain = hourly.precipitation[h.i] ?? 0;
+    const cape = hourly.cape[h.i] ?? 0;
+    const gust = hourly.wind_gusts_10m[h.i] ?? 0;
+    const explicitThunder = code >= 95;
+    const convectiveWatch = h.hour >= 11 && cape >= 500 && (pop >= 35 || rain >= 0.2);
+    const showerWatch = h.hour >= 11 && [80,81,82].includes(code) && cape >= 300;
+    if (explicitThunder || convectiveWatch || showerWatch) {
+      first = { hour: h.hour, code, pop, rain, cape, gust, reason: explicitThunder ? "Thunderstorm in model" : "Convective shower risk" };
+      break;
+    }
+  }
+  if (!first) return { label: "No clear signal", detail: "Still watch afternoon build-up", cls: "wx-low" };
+  const cls = first.reason === "Thunderstorm in model" || first.cape >= 1000 || first.gust >= 45 ? "wx-high" : "wx-med";
+  return {
+    label: `from ${String(first.hour).padStart(2, "0")}:00`,
+    detail: `${first.reason}; CAPE ${fmt(first.cape)}, rain chance ${fmt(first.pop, "%")}, gusts ${fmt(first.gust, "km/h")}`,
+    cls
+  };
+}
+
+function timeDate(time) {
+  return time.slice(0, 10);
+}
+
+async function fetchHourly(stop) {
+  const params = new URLSearchParams({
+    latitude: stop.lat,
+    longitude: stop.lng,
+    elevation: stop.elev,
+    hourly: "weather_code,precipitation_probability,precipitation,cape,wind_speed_10m,wind_gusts_10m",
+    timezone: "Europe/Rome",
+    forecast_days: "10"
+  });
+  const res = await fetch(`https://api.open-meteo.com/v1/forecast?${params.toString()}`);
+  if (!res.ok) throw new Error(`Thunder HTTP ${res.status}`);
+  return res.json();
+}
+
+async function loadMountainWeather() {
+  const status = document.getElementById("weatherStatus");
+  const visual = document.getElementById("weatherVisual");
+  if (!status || !visual) return;
+
+  try {
+    const forecasts = await Promise.all(weatherVisualStops.map(async (stop) => {
+      const params = new URLSearchParams({
+        latitude: stop.lat,
+        longitude: stop.lng,
+        elevation: stop.elev,
+        daily: "weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,snowfall_sum,wind_speed_10m_max,wind_gusts_10m_max,precipitation_probability_max",
+        timezone: "Europe/Rome",
+        forecast_days: "10"
+      });
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?${params.toString()}`);
+      if (!res.ok) throw new Error(`Weather HTTP ${res.status}`);
+      const data = await res.json();
+      const idx = data.daily.time.indexOf(stop.date);
+      const hourlyData = await fetchHourly(stop);
+      const thunder = thunderWindow(hourlyData.hourly, stop.date);
+      if (idx === -1) return { stop, thunder, missing: true };
+      const day = {
+        stop,
+        thunder,
+        code: data.daily.weather_code[idx],
+        tMax: data.daily.temperature_2m_max[idx],
+        tMin: data.daily.temperature_2m_min[idx],
+        precip: data.daily.precipitation_sum[idx],
+        precipProb: data.daily.precipitation_probability_max[idx],
+        snow: data.daily.snowfall_sum[idx],
+        wind: data.daily.wind_speed_10m_max[idx],
+        gust: data.daily.wind_gusts_10m_max[idx]
+      };
+      return day;
+    }));
+
+    visual.innerHTML = `<table>
+      <tr><th>Day</th><th>Route / location</th><th>Weather</th><th>Rain / snow</th><th>Wind</th><th>Thunder risk starts</th><th>Call</th></tr>
+      ${forecasts.map((day) => {
+      if (day.missing) {
+        return `<tr>
+          <td>${day.stop.label}</td>
+          <td>${day.stop.route}<br><span class="small">${day.stop.name} · ${day.stop.elev}m</span></td>
+          <td colspan="3">Forecast not available yet.</td>
+          <td><span class="thunder-time ${day.thunder.cls}">${day.thunder.label}</span></td>
+          <td>Check manually.</td>
+        </tr>`;
+      }
+      const risk = riskFor(day);
+      return `<tr>
+        <td>${day.stop.label}</td>
+        <td>${day.stop.route}<br><span class="small">${day.stop.name} · ${day.stop.elev}m</span></td>
+        <td><span class="wx-risk ${risk.cls}">${risk.label}</span><br><span class="wx-temp">${fmt(day.tMin, "°")} / ${fmt(day.tMax, "°")}</span><br><span class="small">${weatherCodeText[day.code] || "Mountain weather"}</span></td>
+        <td>Rain ${fmt(day.precip, "mm")} · ${fmt(day.precipProb, "%")}<br><span class="small">Snow ${fmt(day.snow, "cm")}</span></td>
+        <td>${fmt(day.wind, "km/h")}<br><span class="small">Gusts ${fmt(day.gust, "km/h")}</span></td>
+        <td><span class="thunder-time ${day.thunder.cls}">${day.thunder.label}</span><br><span class="small">${day.thunder.detail}</span></td>
+        <td>${day.thunder.label === "No clear signal" ? "Normal early start still sensible." : "Be off passes/ridges before this window."}</td>
+      </tr>`;
+    }).join("")}
+    </table>
+    <p class="small">Thunder estimate uses explicit thunderstorm code or afternoon CAPE + precipitation probability/shower signal. It estimates when risk starts; it is not a guarantee.</p>`;
+
+    const worst = forecasts.filter(d => !d.missing).map(riskFor).some(r => r.label === "High")
+      ? "High"
+      : forecasts.filter(d => !d.missing).map(riskFor).some(r => r.label === "Watch")
+        ? "Watch"
+        : "Okay";
+    const advice = worst === "High"
+      ? "High-risk signal in the model: re-check before committing to Santnerpass or the Rotwand traverse."
+      : worst === "Watch"
+        ? "Watch signal in the model: keep timings conservative and avoid late exposed sections."
+        : "No major model signal right now; Santnerpass still needs hut-confirmed route conditions.";
+    status.textContent = `Updated live from Open-Meteo. ${advice}`;
+  } catch (err) {
+    status.textContent = "Weather could not load. Check connection or retry later.";
+    visual.innerHTML = `<p class="small">Fallback: check MeteoBlue, MeteoTrentino/South Tyrol weather, and hut reports before departure.</p>`;
+    console.error(err);
+  }
+}
+
+const map = L.map("map", { scrollWheelZoom: false });
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom: 18,
+  attribution: "&copy; OpenStreetMap contributors"
+}).addTo(map);
+
+const colors = {
+  station: "#4e5956",
+  access: "#b8945e",
+  hut: "#2f5132",
+  pass: "#9a5d44",
+  peak: "#6b4b1f",
+  booked: "#9a5d44",
+  option: "#7a8a5a"
+};
+
+const primaryRoute = [
+  [46.4983, 11.3548],
+  [46.4730, 11.6500],
+  [46.4628, 11.6300],
+  [46.4665, 11.6350],
+  [46.4555, 11.6280],
+  [46.4145, 11.5970],
+  [46.5025, 11.6280],
+  [46.4983, 11.3548]
+];
+const backupRoute = [
+  [46.4983, 11.3548],
+  [46.5419, 11.6170],
+  [46.5170, 11.5650],
+  [46.5025, 11.6280],
+  [46.4628, 11.6300],
+  [46.4555, 11.6280],
+  [46.4665, 11.6350],
+  [46.4628, 11.6300],
+  [46.4145, 11.5970],
+  [46.5170, 11.5650],
+  [46.4983, 11.3548]
+];
+L.polyline(primaryRoute, { color: "#9a5d44", weight: 4, opacity: 0.82 }).addTo(map)
+  .bindPopup("Current booked spine: Bolzano → first hut → Santnerpasshütte → Rotwandhütte → Tierser Alpl → Bolzano");
+L.polyline(backupRoute, { color: "#b8945e", weight: 3, opacity: 0.72, dashArray: "7 6" }).addTo(map)
+  .bindPopup("Schlernhaus first-night branch, plus Rotwand/Schlernhaus lower backup if needed");
+
+points.forEach((p, index) => {
+  const marker = L.circleMarker([p.lat, p.lng], {
+    radius: p.type === "booked" ? 9 : 7,
+    color: "#ffffff",
+    weight: 2,
+    fillColor: colors[p.type] || "#2f5132",
+    fillOpacity: 0.95
+  }).addTo(map);
+  marker.bindPopup(`<strong>${index + 1}. ${p.name}</strong>`);
+});
+
+map.fitBounds(L.latLngBounds(primaryRoute.concat(backupRoute)), { padding: [26, 26] });
+document.querySelectorAll("details").forEach((details) => {
+  details.addEventListener("toggle", () => {
+    if (details.open && details.querySelector("#map")) {
+      setTimeout(() => {
+        map.invalidateSize();
+        map.fitBounds(L.latLngBounds(primaryRoute.concat(backupRoute)), { padding: [26, 26] });
+      }, 120);
+    }
+  });
+});
+renderHutIntel();
+loadGoogleHutData();
+loadTerrainSnow();
+loadMountainWeather();
+</script>
+</body>
+</html>
