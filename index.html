@@ -512,15 +512,20 @@
   @media (max-width: 430px) {
     body { font-size: 14px; line-height: 1.42; }
     .wrap { padding-left: 8px; padding-right: 8px; }
-    .hero { min-height: 132px; padding: 12px; border-radius: 7px; }
+    header { gap: 8px; }
+    .hero { min-height: 104px; padding: 10px; border-radius: 7px; }
     .hero p { display: none; }
+    .hero h1 { margin-bottom: 4px; }
     .badge { font-size: 0.62rem; padding: 2px 6px; margin-bottom: 4px; }
     .meta { margin-top: 7px; }
+    .meta .metric:nth-child(n+3) { display: none; }
     .metric { font-size: 0.72rem; padding: 4px 6px; }
     .panel { padding: 10px 11px; }
+    .panel > .badge, .panel > h3 { display: none; }
     .action-list { gap: 6px; }
-    .action-item { grid-template-columns: 46px minmax(0,1fr); gap: 8px; padding: 7px 9px; border-radius: 7px; }
-    .action-item p { margin-top: 0; }
+    .action-item { grid-template-columns: 42px minmax(0,1fr); gap: 7px; padding: 6px 8px; border-radius: 7px; align-items: center; }
+    .action-item p { display: none; }
+    .action-item strong { font-size: 0.86rem; line-height: 1.2; }
     .plan-head { gap: 6px; margin-bottom: 8px; }
     .plan-summary { gap: 5px; }
     .plan-pill { font-size: 0.73rem; padding: 5px 7px; }
@@ -532,6 +537,17 @@
     details { margin-top: 9px; border-radius: 7px; }
     summary { min-height: 42px; padding: 10px 12px; font-size: 0.88rem; }
     .quick-nav { margin-left: -8px; margin-right: -8px; padding-left: 8px; padding-right: 8px; }
+    .field-head { align-items: center; }
+    .field-head .sub { display: none; }
+    .signal-strip { grid-template-columns: repeat(4, minmax(0,1fr)); gap: 4px; }
+    .signal { padding: 5px 4px; text-align: center; }
+    .signal strong { font-size: 0.78rem; }
+    .signal span { font-size: 0.62rem; line-height: 1.15; }
+    .field-row { grid-template-columns: 46px minmax(0,1fr) 48px; gap: 6px; padding: 7px 8px; }
+    .field-row .label { font-size: 0.62rem; }
+    .field-row .main { font-size: 0.8rem; line-height: 1.18; }
+    .field-row .detail { font-size: 0.7rem; line-height: 1.2; }
+    .field-call { grid-column: auto; justify-self: end; align-self: center; font-size: 0.58rem; padding: 3px 6px; }
     .checklist label { min-height: 40px; padding: 8px 0; }
     .checklist input { width: 22px; height: 22px; }
   }
