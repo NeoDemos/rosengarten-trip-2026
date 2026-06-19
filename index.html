@@ -325,22 +325,6 @@
     padding: 12px 14px;
   }
   .decision-card p { font-size: 0.9rem; }
-  .hut-toolbar {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
-    margin: 10px 0 14px;
-  }
-  .hut-toolbar input {
-    flex: 1 1 260px;
-    min-width: 220px;
-    border: 1px solid var(--line);
-    border-radius: 6px;
-    padding: 9px 10px;
-    font: inherit;
-    min-height: 44px;
-  }
   .btn {
     border: 1px solid var(--forest);
     border-radius: 6px;
@@ -506,7 +490,6 @@
     .field-row .main { font-size: 0.88rem; line-height: 1.24; }
     .field-row .detail { font-size: 0.78rem; line-height: 1.28; }
     .field-call { grid-column: 2; justify-self: start; font-size: 0.66rem; padding: 4px 8px; }
-    .hut-toolbar input, .hut-toolbar .btn { flex-basis: 100%; min-width: 0; width: 100%; }
     details > *:not(summary) { margin-left: 12px; margin-right: 12px; }
   }
   @media (max-width: 430px) {
@@ -582,7 +565,7 @@
       <div class="action-list">
         <div class="action-item">
           <span class="status requested">Open</span>
-          <div><strong>22 June hut</strong><p>Haniger Schwaige requested. Start St. Zyprian and hike up; keep Vajolet/Preuss/Gardeccia as fallbacks.</p></div>
+          <div><strong>22 June hut</strong><p>Haniger Schwaige requested. Start St. Zyprian and hike up from the valley.</p></div>
         </div>
         <div class="action-item">
           <span class="status todo">Pay</span>
@@ -602,6 +585,7 @@
     <a href="#weather">Weather</a>
     <a href="#snow">Snow</a>
     <a href="#safety">Safety</a>
+    <a href="#grading">Grades</a>
     <a href="#huts">Huts</a>
     <a href="#essentials">Essentials</a>
     <a href="#packing">Pack</a>
@@ -729,7 +713,7 @@
         <table>
           <tr><th>Date</th><th>Plan</th><th>Night</th><th>Status</th><th>Cost</th><th>Next</th></tr>
           <tr><td><strong>Sun 21 Jun</strong></td><td>Nightjet from Utrecht toward Bolzano.</td><td>Nightjet</td><td><span class="status booked">Booked</span></td><td>Booked ticket</td><td>Ticket saved</td></tr>
-          <tr><td><strong>Mon 22 Jun</strong></td><td>Arrive Bolzano 11:27 → bus 185 to St. Zyprian → Outdooractive T2 hike 6.2 km / 3:05 h / +854 m to Haniger.</td><td>Haniger Schwaige requested; Vajolet/Preuss/Gardeccia fallback</td><td><span class="status requested">Open</span></td><td>TBC</td><td>Await Haniger reply</td></tr>
+          <tr><td><strong>Mon 22 Jun</strong></td><td>Arrive Bolzano 11:27 → bus 185 to St. Zyprian → Outdooractive T2 hike 6.2 km / 3:05 h / +854 m to Haniger.</td><td>Haniger Schwaige requested</td><td><span class="status requested">Open</span></td><td>TBC</td><td>Await Haniger reply</td></tr>
           <tr class="crux-row"><td><strong>Tue 23 Jun</strong></td><td>Haniger → Santnerpasshütte on selected Outdooractive no-ferrata T3 route: 10.4 km, 5:40 h, +1419 m / -609 m, short cable section.</td><td>Santnerpasshütte / Rifugio Passo Santner</td><td><span class="status booked">Booked</span></td><td>EUR 105</td><td>Start 06:00-06:30; pay deposit</td></tr>
           <tr><td><strong>Wed 24 Jun</strong></td><td>Santnerpasshütte → Rotwandhütte Outdooractive T3: 13.0 km, 6:10 h, +921 m / -1364 m.</td><td>Rotwandhütte / Rifugio Roda di Vael</td><td><span class="status booked">Booked</span></td><td>Half-board EUR 58 member / EUR 80 nonmember; EUR 22 deposit due</td><td>Start 06:30-07:00; deposit</td></tr>
           <tr><td><strong>Thu 25 Jun</strong></td><td>Rotwandhütte → Tierser Alpl Outdooractive T3: 11.7 km, 5:48 h, +1119 m / -951 m.</td><td><strong>Tierser Alpl / Rifugio Alpe di Tires</strong></td><td><span class="status booked">Booked</span></td><td>EUR 99 half-board; EUR 69 paid</td><td>Start 06:30-07:00; EUR 30 due</td></tr>
@@ -756,14 +740,8 @@
   </section>
 
   <section id="huts">
-    <h2>Hut Data</h2>
-    <p class="sub">Static booking facts plus optional live Google Places photos, ratings, review snippets, websites and map links. Uses the same local API key as the older planner.</p>
-    <div class="hut-toolbar">
-      <input type="password" id="gApiKey" placeholder="Google Places API key, if not already saved">
-      <button class="btn" type="button" onclick="saveApiKey()">Load Google data</button>
-      <button class="btn secondary" type="button" onclick="clearApiKey()">Clear key</button>
-      <span id="apiKeyStatusText" class="api-status">Fallback data loaded. Add a Google key for live details.</span>
-    </div>
+    <h2>Huts</h2>
+    <p class="sub">Only the huts on the active plan, with static booking facts and map links.</p>
     <div id="hutIntel" class="hut-intel-grid"></div>
   </section>
 
@@ -776,7 +754,7 @@
 
   <section id="weather">
     <h2>Mountain Weather</h2>
-    <p class="sub">Live Open-Meteo forecast at booked/pending hut elevations. Monday shows Haniger plus the Vajolet fallback. Planning signal only: not an avalanche, snowpack, or route-condition report.</p>
+    <p class="sub">Live Open-Meteo forecast at booked/pending hut elevations. Monday shows Haniger. Planning signal only: not an avalanche, snowpack, or route-condition report.</p>
     <div id="weatherStatus" class="wx-loading">Loading mountain forecast...</div>
     <div id="weatherVisual" class="weather-visual"></div>
   </section>
@@ -851,9 +829,34 @@
     <p class="small"><strong>Bottom line:</strong> Haniger is a beautiful no-lift Monday and your saved routes avoid via ferrata. Solo is reasonable only in dry, stable, early conditions with positive hut reports and no hard/exposed snow. If the ground turns into true ferrata terrain unexpectedly, stop and re-plan rather than improvising.</p>
   </section>
 
+  <details id="grading">
+    <summary>T-path and via ferrata grades</summary>
+    <div class="table-scroll">
+      <table>
+        <tr><th>SAC hiking grade</th><th>Meaning</th><th>For this trip</th></tr>
+        <tr><td><strong>T1</strong></td><td>Simple walking paths, low exposure, no special mountain technique.</td><td>Not the main terrain.</td></tr>
+        <tr><td><strong>T2</strong></td><td>Mountain hiking. Marked path, sometimes steep, fall risk possible, trekking shoes and basic navigation.</td><td>Monday to Haniger is T2 difficult.</td></tr>
+        <tr><td><strong>T3</strong></td><td>Demanding mountain hiking. Exposed sections possible, occasional hands for balance, ropes/chains may protect short places, sure-footedness required.</td><td>Main trip grade: Tue/Wed/Thu, plus Fri descent. Helmet on in rockfall/cable terrain.</td></tr>
+        <tr><td><strong>T4</strong></td><td>Alpine hiking. Path may fade, more exposed, hands sometimes needed, snow/firn can matter.</td><td>Avoid solo unless hut reports and weather are excellent.</td></tr>
+        <tr><td><strong>T5-T6</strong></td><td>Demanding/difficult alpine terrain, often pathless, climbing sections, serious exposure, glacier/firn judgment may be needed.</td><td>No-go for this solo plan without partner/guide and different equipment.</td></tr>
+      </table>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <tr><th>Via ferrata grade</th><th>Meaning</th><th>Solo rule</th></tr>
+        <tr><td><strong>A</strong></td><td>Easy secured path, mild exposure, mostly walking/climbing aids.</td><td>Still helmet; lanyard if it is a true ferrata route.</td></tr>
+        <tr><td><strong>B</strong></td><td>Moderate, steeper sections, more exposure, some arm use.</td><td>Use full ferrata kit; avoid if wet/thunder/snow.</td></tr>
+        <tr><td><strong>C</strong></td><td>Difficult, steep/exposed, sustained effort and confident clipping needed.</td><td>Not a casual backup when solo.</td></tr>
+        <tr><td><strong>D</strong></td><td>Very difficult, often vertical/overhanging, strenuous and exposed.</td><td>No-go for this trip plan.</td></tr>
+        <tr><td><strong>E/F</strong></td><td>Extremely difficult, very strenuous, expert-only terrain.</td><td>No-go.</td></tr>
+      </table>
+    </div>
+    <p class="small">Your saved Outdooractive routes are hiking routes, not via ferrata routes. A short cable on a T3 path is different from a graded via ferrata, but wet cable, snow, ice or thunder still turns it into a turnaround/reroute signal.</p>
+  </details>
+
   <details>
     <summary>Map</summary>
-    <p class="sub">Red = current booked spine with a valley hike-up start. Gold dashed = lower backup if Monday forces a valley or Gardeccia night.</p>
+    <p class="sub">Red = active route spine from Bolzano to the huts, then St. Zyprian bus and Bolzano.</p>
     <div id="map"></div>
   </details>
 
@@ -1037,7 +1040,7 @@
         <h3>Bookings</h3>
         <ul class="checklist">
           <li><input type="checkbox">Confirm/pay Santnerpasshütte deposit and save written confirmation.</li>
-          <li><input type="checkbox">Confirm Monday 22 June: Haniger Schwaige, or fall back to Vajolet, Paul Preuss, Gardeccia or valley hotel.</li>
+          <li><input type="checkbox">Confirm Monday 22 June: Haniger Schwaige.</li>
           <li><input type="checkbox">Send written confirmation and pay EUR 22 Rotwandhütte deposit for Wednesday 24 June.</li>
           <li><input type="checkbox">Save Tierser Alpl 25 June confirmation and note EUR 30 remaining balance.</li>
           <li><input type="checkbox">Save Nightjet tickets offline and as print/PDF backup.</li>
@@ -1062,29 +1065,20 @@ const points = [
   { name: "Bolzano / Bozen Hbf", lat: 46.4983, lng: 11.3548, type: "station" },
   { name: "St. Zyprian / San Cipriano", lat: 46.4660, lng: 11.5580, type: "access" },
   { name: "Haniger Schwaige / Malga Haniger", lat: 46.46579, lng: 11.61078, type: "option" },
-  { name: "Rifugio Fronza / Kölner Hütte", lat: 46.4427, lng: 11.6121, type: "hut" },
-  { name: "Vigo di Fassa / Pera fallback", lat: 46.4210, lng: 11.6730, type: "access" },
-  { name: "Rifugio Gardeccia", lat: 46.4450, lng: 11.6450, type: "option" },
-  { name: "Rifugio Paul Preuss", lat: 46.4620, lng: 11.6290, type: "option" },
-  { name: "Tierser Alpl", lat: 46.5025, lng: 11.6280, type: "hut" },
   { name: "Grasleitenpass / Passo Principe", lat: 46.4720, lng: 11.6350, type: "pass" },
   { name: "Passo Santner", lat: 46.4555, lng: 11.6280, type: "pass" },
   { name: "Passo delle Coronelle / Tschagerjoch", lat: 46.4480, lng: 11.6100, type: "pass" },
   { name: "Passo delle Cigolade", lat: 46.4320, lng: 11.6200, type: "pass" },
   { name: "Passo di Molignon", lat: 46.4970, lng: 11.6350, type: "pass" },
   { name: "Sas de Scalieret / Cima Scalieret", lat: 46.46336, lng: 11.64445, type: "peak" },
-  { name: "Rifugio Vajolet", lat: 46.4628, lng: 11.6300, type: "hut" },
-  { name: "Rifugio Re Alberto", lat: 46.4665, lng: 11.6350, type: "hut" },
   { name: "Santnerpasshütte / Rifugio Passo Santner", lat: 46.4555, lng: 11.6280, type: "booked" },
-  { name: "Rifugio Antermoia", lat: 46.4900, lng: 11.6450, type: "option" },
   { name: "Rotwandhütte / Rifugio Roda di Vael", lat: 46.4145, lng: 11.5970, type: "booked" },
-  { name: "Tierser Alpl / exit side", lat: 46.5025, lng: 11.6280, type: "hut" },
+  { name: "Tierser Alpl / Rifugio Alpe di Tires", lat: 46.5025, lng: 11.6280, type: "booked" },
   { name: "Bolzano return", lat: 46.4983, lng: 11.3548, type: "station" }
 ];
 
 const weatherVisualStops = [
   { date: "2026-06-22", label: "Mon 22", route: "Bolzano → St. Zyprian → hike up", name: "Haniger Schwaige target", lat: 46.46579, lng: 11.61078, elev: 1937 },
-  { date: "2026-06-22", label: "Mon 22", route: "Fallback: Vigo/Pera → hike up", name: "Vajolet / Gardeccia fallback", lat: 46.4628, lng: 11.6300, elev: 2243 },
   { date: "2026-06-23", label: "Tue 23", route: "First hut → Santnerpasshütte", name: "Santnerpasshütte", lat: 46.4555, lng: 11.6280, elev: 2734 },
   { date: "2026-06-24", label: "Wed 24", route: "Santner → Rotwandhütte", name: "Rotwandhütte / Roda di Vael", lat: 46.4145, lng: 11.5970, elev: 2283 },
   { date: "2026-06-25", label: "Thu 25", route: "24 Jun hut → Tierser Alpl", name: "Tierser Alpl", lat: 46.5025, lng: 11.6280, elev: 2440 },
@@ -1097,7 +1091,6 @@ const snowTerrainPoints = [
   { name: "Passo delle Coronelle / Tschagerjoch", role: "Rosengarten traverse pass", day: "Route dependent", lat: 46.4480, lng: 11.6100, elev: 2630, exposure: "Can hold old snow on shaded approaches." },
   { name: "Passo delle Cigolade", role: "Roda di Vael connector", day: "Wed/Thu option", lat: 46.4320, lng: 11.6200, elev: 2553, exposure: "Likely relevant around Rotwandhütte routing." },
   { name: "Passo di Molignon", role: "Tierser Alpl approach", day: "Thu 25", lat: 46.4970, lng: 11.6350, elev: 2598, exposure: "High pass near Tierser Alpl; check if crossing late." },
-  { name: "Passo di Antermoia", role: "High backup route", day: "Backup", lat: 46.4870, lng: 11.6640, elev: 2770, exposure: "High and more snow-sensitive; keep as backup intel." },
   { name: "Sas de Scalieret / Cima Scalieret", role: "Nearby peak snow proxy", day: "Optional / context", lat: 46.46336, lng: 11.64445, elev: 2887, exposure: "Peak proxy above Vajolet/Principe; useful for high-snow signal." }
 ];
 
@@ -1134,52 +1127,7 @@ const hutData = [
     phone: "Contact form sent",
     website: "https://www.hanigerschwaige.com/de/#kontakt-scroll",
     query: "Haniger Schwaige Malga Haniger",
-    fallback: { rating: 4.7, count: 120, source: "current request + researched fallback", snippet: "Requested for Monday. No-lift start from St. Zyprian; good scenic setup below the Vajolet Towers, but Tuesday route to Santnerpasshütte must be confirmed carefully." }
-  },
-  {
-    key: "vajolet",
-    name: "Rifugio Vajolet",
-    role: "Fallback first-night target",
-    status: "Open",
-    date: "Mon 22",
-    elev: 2243,
-    lat: 46.4628,
-    lng: 11.6300,
-    cost: "~EUR 60-90 est.",
-    phone: "+39 335 7073258 / +39 0462 763292",
-    website: "https://booking.rifugiovajolet.com/index_en.php",
-    query: "Rifugio Vajolet",
-    fallback: { rating: 4.5, count: 180, source: "researched fallback", snippet: "Best practical no-lift first night: hike up from Vigo/Pera, sleep near the Vajolet/Gartl line, start Tuesday close to Santner." }
-  },
-  {
-    key: "preuss",
-    name: "Rifugio Paul Preuss",
-    role: "Tiny first-night target",
-    status: "Open",
-    date: "Mon 22",
-    elev: 2243,
-    lat: 46.4620,
-    lng: 11.6290,
-    cost: "~EUR 60-90 est.",
-    phone: "+39 0462 764847 / +39 368 7884968",
-    website: "mailto:info@rifugiopaulpreuss.com",
-    query: "Rifugio Paul Preuss",
-    fallback: { rating: 4.7, count: 120, source: "researched fallback", snippet: "Small, characterful hut above Gardeccia and beside Vajolet. Excellent if a bed is available." }
-  },
-  {
-    key: "gardeccia",
-    name: "Rifugio Gardeccia",
-    role: "Lower first-night fallback",
-    status: "Open",
-    date: "Mon 22",
-    elev: 1949,
-    lat: 46.4450,
-    lng: 11.6450,
-    cost: "~EUR 60-90 est.",
-    phone: "+39 0462 763152 / +39 335 7432677",
-    website: "https://www.gardeccia.it/en/",
-    query: "Rifugio Gardeccia",
-    fallback: { rating: 4.5, count: 160, source: "researched fallback", snippet: "Lower and easier after the train. Adds roughly one uphill hour Tuesday before the Vajolet/Gartl approach." }
+    fallback: { rating: 4.7, count: 120, source: "current request + static info", snippet: "Requested for Monday. No-lift start from St. Zyprian; good scenic setup below the Vajolet Towers, but Tuesday route to Santnerpasshütte must be confirmed carefully." }
   },
   {
     key: "santner",
@@ -1194,22 +1142,7 @@ const hutData = [
     phone: "info@santnerpass.com",
     website: "mailto:info@santnerpass.com",
     query: "Santnerpasshütte Rifugio Passo Santner",
-    fallback: { rating: 4.8, count: 40, source: "booking email + fallback", snippet: "Booked bed in shared room. Includes vegetarian 4-course dinner and breakfast; deposit confirms the reservation." }
-  },
-  {
-    key: "antermoia",
-    name: "Rifugio Antermoia",
-    role: "24 June backup",
-    status: "Requested",
-    date: "Wed 24",
-    elev: 2497,
-    lat: 46.4900,
-    lng: 11.6450,
-    cost: "~EUR 65 est.",
-    phone: "+39 333 1407402",
-    website: "https://www.rifugioantermoia.com/",
-    query: "Rifugio Antermoia Catinaccio",
-    fallback: { rating: 4.6, count: 120, source: "researched fallback", snippet: "Good high-route option, but no longer the active night now that Rotwandhütte has space." }
+    fallback: { rating: 4.8, count: 40, source: "booking email + static info", snippet: "Booked bed in shared room. Includes vegetarian 4-course dinner and breakfast; deposit confirms the reservation." }
   },
   {
     key: "rodaVael",
@@ -1224,7 +1157,7 @@ const hutData = [
     phone: "+39 0462 764450",
     website: "https://www.rodadivael.it/en/",
     query: "Rifugio Roda di Vael",
-    fallback: { rating: 4.5, count: 95, source: "booking email + fallback", snippet: "Dormitory space confirmed for 24 June. Check-in from 14:30, arrive by 18:00, quiet from 22:00, vacate room by 09:00. Sleeping liner required; bring slippers and hygiene items. No via ferrata equipment rental." }
+    fallback: { rating: 4.5, count: 95, source: "booking email + static info", snippet: "Dormitory space confirmed for 24 June. Check-in from 14:30, arrive by 18:00, quiet from 22:00, vacate room by 09:00. Sleeping liner required; bring slippers and hygiene items. No via ferrata equipment rental." }
   },
   {
     key: "tierserAlpl",
@@ -1239,12 +1172,10 @@ const hutData = [
     phone: "+39 0471 727958",
     website: "https://www.tierseralpl.com/en/",
     query: "Tierser Alpl Rifugio Alpe di Tires",
-    fallback: { rating: 4.7, count: 480, source: "researched fallback", snippet: "Booked. Iconic red hut on the pass, excellent final position for Friday's descent." }
+    fallback: { rating: 4.7, count: 480, source: "static info", snippet: "Booked. Iconic red hut on the pass, excellent final position for Friday's descent." }
   }
 ];
 
-let googleApiKey = localStorage.getItem("hiken_gapi_key") || "";
-const PLACES_API_BASE = "https://places.googleapis.com/v1";
 const DATA_CACHE_PREFIX = "rosen_data_cache_";
 const DATA_CACHE_MAX_AGE = 10 * 24 * 60 * 60 * 1000;
 
@@ -1327,113 +1258,6 @@ function renderHutIntel() {
   grid.innerHTML = hutData.map(hut => renderHutCard(hut)).join("");
 }
 
-function updateApiKeyStatus(text, ok = false) {
-  const el = document.getElementById("apiKeyStatusText");
-  if (!el) return;
-  el.textContent = text;
-  el.style.color = ok ? "var(--forest)" : "var(--muted)";
-  el.style.fontWeight = ok ? "700" : "400";
-}
-
-function saveApiKey() {
-  const input = document.getElementById("gApiKey");
-  const key = input?.value.trim();
-  if (!key) {
-    updateApiKeyStatus("Paste a Google Places API key first.");
-    return;
-  }
-  localStorage.setItem("hiken_gapi_key", key);
-  googleApiKey = key;
-  loadGoogleHutData();
-}
-
-function clearApiKey() {
-  localStorage.removeItem("hiken_gapi_key");
-  Object.keys(localStorage)
-    .filter(k => k.startsWith("rosen_place_") || k.startsWith("rosen_details_"))
-    .forEach(k => localStorage.removeItem(k));
-  googleApiKey = "";
-  const input = document.getElementById("gApiKey");
-  if (input) input.value = "";
-  renderHutIntel();
-  updateApiKeyStatus("Google key cleared. Fallback data loaded.");
-}
-
-async function searchPlaceNew(query, lat, lng, radius = 3500) {
-  const cacheKey = `rosen_place_${query.replace(/\W/g, "_")}`;
-  const cached = localStorage.getItem(cacheKey);
-  if (cached) {
-    const obj = JSON.parse(cached);
-    if (Date.now() - obj.ts < 30 * 24 * 60 * 60 * 1000) return obj.data;
-  }
-  const body = {
-    textQuery: query,
-    maxResultCount: 5,
-    locationBias: { circle: { center: { latitude: lat, longitude: lng }, radius } }
-  };
-  const res = await fetch(`${PLACES_API_BASE}/places:searchText`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Goog-Api-Key": googleApiKey,
-      "X-Goog-FieldMask": "places.id,places.displayName,places.location,places.formattedAddress"
-    },
-    body: JSON.stringify(body)
-  });
-  if (!res.ok) throw new Error(`Google search HTTP ${res.status}`);
-  const data = await res.json();
-  if (!data.places?.length) return null;
-  const best = data.places.reduce((closest, place) => {
-    const current = haversine(lat, lng, place.location.latitude, place.location.longitude);
-    const previous = haversine(lat, lng, closest.location.latitude, closest.location.longitude);
-    return current < previous ? place : closest;
-  }, data.places[0]);
-  const result = { id: best.id, name: best.displayName?.text, location: best.location };
-  localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data: result }));
-  return result;
-}
-
-async function getPlaceDetailsNew(placeId) {
-  const cacheKey = `rosen_details_${placeId}`;
-  const cached = localStorage.getItem(cacheKey);
-  if (cached) {
-    const obj = JSON.parse(cached);
-    if (Date.now() - obj.ts < 7 * 24 * 60 * 60 * 1000) return obj.data;
-  }
-  const res = await fetch(`${PLACES_API_BASE}/places/${placeId}`, {
-    headers: {
-      "X-Goog-Api-Key": googleApiKey,
-      "X-Goog-FieldMask": "displayName,rating,userRatingCount,reviews,photos,websiteUri,googleMapsUri,internationalPhoneNumber"
-    }
-  });
-  if (!res.ok) throw new Error(`Google details HTTP ${res.status}`);
-  const place = await res.json();
-  const data = {
-    name: place.displayName?.text,
-    rating: place.rating,
-    count: place.userRatingCount,
-    phone: place.internationalPhoneNumber,
-    website: place.websiteUri,
-    googleMapsUrl: place.googleMapsUri,
-    reviews: (place.reviews || []).slice(0, 2).map(r => ({
-      author: r.authorAttribution?.displayName || "Google reviewer",
-      rating: r.rating,
-      text: r.text?.text || r.originalText?.text || "",
-      time: r.relativePublishTimeDescription || ""
-    })),
-    photos: (place.photos || []).slice(0, 3).map(p => ({
-      thumb: photoUrlFromName(p.name, 320),
-      full: photoUrlFromName(p.name, 900)
-    }))
-  };
-  localStorage.setItem(cacheKey, JSON.stringify({ ts: Date.now(), data }));
-  return data;
-}
-
-function photoUrlFromName(photoName, maxWidth = 800) {
-  return `${PLACES_API_BASE}/${photoName}/media?maxWidthPx=${maxWidth}&key=${googleApiKey}`;
-}
-
 function haversine(lat1, lng1, lat2, lng2) {
   const R = 6371000;
   const toRad = x => x * Math.PI / 180;
@@ -1441,33 +1265,6 @@ function haversine(lat1, lng1, lat2, lng2) {
   const dLng = toRad(lng2 - lng1);
   const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
   return 2 * R * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
-async function loadGoogleHutData() {
-  if (!googleApiKey) {
-    updateApiKeyStatus("Fallback data loaded. Add a Google key for live details.");
-    return;
-  }
-  const input = document.getElementById("gApiKey");
-  if (input) input.value = googleApiKey;
-  let loaded = 0;
-  updateApiKeyStatus("Loading Google Places data...");
-  for (const hut of hutData) {
-    try {
-      const place = await searchPlaceNew(hut.query, hut.lat, hut.lng);
-      if (!place) continue;
-      const details = await getPlaceDetailsNew(place.id);
-      if (!details) continue;
-      const card = document.getElementById(`hut-${hut.key}`);
-      if (card) card.outerHTML = renderHutCard(hut, details);
-      loaded += 1;
-      updateApiKeyStatus(`Google Places loaded for ${loaded}/${hutData.length} huts...`, true);
-      await new Promise(resolve => setTimeout(resolve, 80));
-    } catch (err) {
-      console.warn(`Google Places failed for ${hut.name}:`, err);
-    }
-  }
-  updateApiKeyStatus(loaded ? `Google Places live data loaded for ${loaded}/${hutData.length} huts.` : "Google Places could not load. Fallback data remains visible.", Boolean(loaded));
 }
 
 function riskFor(day) {
@@ -1738,22 +1535,8 @@ const primaryRoute = [
   [46.4715, 11.5550],
   [46.4983, 11.3548]
 ];
-const backupRoute = [
-  [46.4983, 11.3548],
-  [46.4210, 11.6730],
-  [46.4450, 11.6450],
-  [46.4628, 11.6300],
-  [46.4555, 11.6280],
-  [46.4665, 11.6350],
-  [46.4628, 11.6300],
-  [46.4145, 11.5970],
-  [46.5025, 11.6280],
-  [46.4983, 11.3548]
-];
 L.polyline(primaryRoute, { color: "#9a5d44", weight: 4, opacity: 0.82 }).addTo(map)
   .bindPopup("Current spine: Bolzano → St. Zyprian → Haniger → Santnerpasshütte → Rotwandhütte → Tierser Alpl → St. Zyprian bus → Bolzano");
-L.polyline(backupRoute, { color: "#b8945e", weight: 3, opacity: 0.72, dashArray: "7 6" }).addTo(map)
-  .bindPopup("Fallback Monday: Vigo/Pera or Gardeccia start, then continue toward Vajolet/Gartl if conditions and timing allow");
 
 points.forEach((p, index) => {
   const marker = L.circleMarker([p.lat, p.lng], {
@@ -1766,13 +1549,13 @@ points.forEach((p, index) => {
   marker.bindPopup(`<strong>${index + 1}. ${p.name}</strong>`);
 });
 
-map.fitBounds(L.latLngBounds(primaryRoute.concat(backupRoute)), { padding: [26, 26] });
+map.fitBounds(L.latLngBounds(primaryRoute), { padding: [26, 26] });
 document.querySelectorAll("details").forEach((details) => {
   details.addEventListener("toggle", () => {
     if (details.open && details.querySelector("#map")) {
       setTimeout(() => {
         map.invalidateSize();
-        map.fitBounds(L.latLngBounds(primaryRoute.concat(backupRoute)), { padding: [26, 26] });
+        map.fitBounds(L.latLngBounds(primaryRoute), { padding: [26, 26] });
       }, 120);
     }
   });
@@ -1817,7 +1600,6 @@ function registerOfflineShell() {
 initChecklistState();
 registerOfflineShell();
 renderHutIntel();
-loadGoogleHutData();
 loadTerrainSnow();
 loadMountainWeather();
 </script>
