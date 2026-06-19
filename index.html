@@ -864,7 +864,7 @@
       </div>
       <div class="focus-card">
         <h3>Phone copy</h3>
-        <p>AirDrop or iCloud Drive this HTML to your iPhone and open it in Safari/Files. Core plan, safety, hut facts, cash and packing list stay readable; live weather, snow, Google hut data and map tiles need internet.</p>
+        <p>Add the GitHub Pages version to your iPhone Home Screen and open it once with internet. The core app plus last loaded weather/snow snapshots stay readable offline; map tiles/photos only work offline after they have been viewed once.</p>
       </div>
     </div>
     <details>
@@ -1190,6 +1190,8 @@ const hutData = [
 
 let googleApiKey = localStorage.getItem("hiken_gapi_key") || "";
 const PLACES_API_BASE = "https://places.googleapis.com/v1";
+const DATA_CACHE_PREFIX = "rosen_data_cache_";
+const DATA_CACHE_MAX_AGE = 10 * 24 * 60 * 60 * 1000;
 
 function escapeHTML(value = "") {
   return String(value).replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[ch]));
@@ -1209,6 +1211,31 @@ function starsFor(rating) {
 
 function googleMapsLink(hut) {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${hut.name} ${hut.elev}m`)}`;
+}
+
+async function cachedJson(cacheKey, url, options = {}) {
+  const key = `${DATA_CACHE_PREFIX}${cacheKey}`;
+  const cached = localStorage.getItem(key);
+  try {
+    const res = await fetch(url, options);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data }));
+    return { data, cached: false, ts: Date.now() };
+  } catch (err) {
+    if (!cached) throw err;
+    const parsed = JSON.parse(cached);
+    return { data: parsed.data, cached: true, ts: parsed.ts };
+  }
+}
+
+function cacheAgeLabel(ts) {
+  if (!ts) return "";
+  const minutes = Math.max(0, Math.round((Date.now() - ts) / 60000));
+  if (minutes < 90) return `${minutes}m old`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 48) return `${hours}h old`;
+  return `${Math.round(hours / 24)}d old`;
 }
 
 function renderHutCard(hut, live = null) {
@@ -1427,21 +1454,17 @@ async function fetchSnowPoint(point) {
     timezone: "Europe/Rome",
     forecast_days: "5"
   });
-  const res = await fetch(`https://api.open-meteo.com/v1/forecast?${params.toString()}`);
-  if (!res.ok) throw new Error(`Snow HTTP ${res.status}`);
-  const data = await res.json();
+  const { data, cached, ts } = await cachedJson(`snow_${point.name.replace(/\W/g, "_")}`, `https://api.open-meteo.com/v1/forecast?${params.toString()}`);
   const depthM = data.current?.snow_depth;
   const snowCm = Number.isFinite(depthM) ? depthM * 100 : NaN;
   const freshCm = (data.daily?.snowfall_sum || []).slice(0, 3).reduce((sum, v) => sum + (Number(v) || 0), 0);
   const tMin = Math.min(...(data.daily?.temperature_2m_min || []).slice(0, 3).filter(Number.isFinite));
   const tMax = Math.max(...(data.daily?.temperature_2m_max || []).slice(0, 3).filter(Number.isFinite));
-  return { point, snowCm, freshCm, tMin, tMax };
+  return { point, snowCm, freshCm, tMin, tMax, cached, ts };
 }
 
 async function fetchObservedSnowStations() {
-  const res = await fetch("https://geoservices.buergernetz.bz.it/services/meteo/v1/sensors?output_format=JSON");
-  if (!res.ok) throw new Error(`Observed snow HTTP ${res.status}`);
-  const sensors = await res.json();
+  const { data: sensors, cached, ts } = await cachedJson("observed_snow_stations", "https://geoservices.buergernetz.bz.it/services/meteo/v1/sensors?output_format=JSON");
   return observedSnowStations.map(station => {
     const sensor = sensors.find(item => item.SCODE === station.sensorCode && item.TYPE === "HS");
     const raw = Number(sensor?.VALUE);
@@ -1450,7 +1473,9 @@ async function fetchObservedSnowStations() {
       ...station,
       snowCm,
       date: sensor?.DATE || "",
-      source: sensor?.DESC_D ? "South Tyrol official station" : "No live value"
+      source: sensor?.DESC_D ? `South Tyrol official station${cached ? ` · cached ${cacheAgeLabel(ts)}` : ""}` : "No live value",
+      cached,
+      ts
     };
   });
 }
@@ -1492,7 +1517,8 @@ async function loadTerrainSnow() {
     <p class="small"><strong>Observed</strong> rows are real station snow-height measurements from the South Tyrol official open-data service. <strong>Modelled</strong> rows are Open-Meteo snow depth at the specified pass/peak elevation, converted from metres to cm. Pass coordinates are route-planning proxies; exact trail snow can differ sharply in shaded gullies.</p>`;
     const worst = rows.reduce((max, r) => Math.max(max, Number.isFinite(r.snowCm) ? r.snowCm : 0), 0);
     const worstObserved = observedRows.reduce((max, r) => Math.max(max, Number.isFinite(r.snowCm) ? r.snowCm : 0), 0);
-    status.textContent = `Observed stations loaded plus ${rows.length} modelled passes/peaks. Highest observed station: ${fmt(worstObserved, "cm")}; highest modelled pass/peak: ${fmt(worst, "cm")}.`;
+    const cachedRows = rows.filter(r => r.cached).length + observedRows.filter(r => r.cached).length;
+    status.textContent = `${cachedRows ? "Offline/cache mode: " : ""}Observed stations loaded plus ${rows.length} modelled passes/peaks. Highest observed station: ${fmt(worstObserved, "cm")}; highest modelled pass/peak: ${fmt(worst, "cm")}.${cachedRows ? " Some values are saved snapshots." : ""}`;
   } catch (err) {
     status.textContent = "Observed/model snow could not load. Ask Santnerpasshütte, Rotwandhütte and Tierser Alpl for trail conditions.";
     visual.innerHTML = `<p class="small">Fallback: check official South Tyrol station snow heights, then treat Santnerpass, Passo Principe, Cigolade/Coronelle and Scalieret as snow-sensitive until local hut reports say otherwise.</p>`;
@@ -1542,9 +1568,10 @@ async function fetchHourly(stop) {
     timezone: "Europe/Rome",
     forecast_days: "10"
   });
-  const res = await fetch(`https://api.open-meteo.com/v1/forecast?${params.toString()}`);
-  if (!res.ok) throw new Error(`Thunder HTTP ${res.status}`);
-  return res.json();
+  const { data, cached, ts } = await cachedJson(`hourly_${stop.date}_${stop.name.replace(/\W/g, "_")}`, `https://api.open-meteo.com/v1/forecast?${params.toString()}`);
+  data.__cached = cached;
+  data.__cacheTs = ts;
+  return data;
 }
 
 async function loadMountainWeather() {
@@ -1562,16 +1589,16 @@ async function loadMountainWeather() {
         timezone: "Europe/Rome",
         forecast_days: "10"
       });
-      const res = await fetch(`https://api.open-meteo.com/v1/forecast?${params.toString()}`);
-      if (!res.ok) throw new Error(`Weather HTTP ${res.status}`);
-      const data = await res.json();
+      const { data, cached, ts } = await cachedJson(`weather_${stop.date}_${stop.name.replace(/\W/g, "_")}`, `https://api.open-meteo.com/v1/forecast?${params.toString()}`);
       const idx = data.daily.time.indexOf(stop.date);
       const hourlyData = await fetchHourly(stop);
       const thunder = thunderWindow(hourlyData.hourly, stop.date);
-      if (idx === -1) return { stop, thunder, missing: true };
+      if (idx === -1) return { stop, thunder, missing: true, cached: cached || hourlyData.__cached, ts: ts || hourlyData.__cacheTs };
       const day = {
         stop,
         thunder,
+        cached: cached || hourlyData.__cached,
+        ts: cached ? ts : hourlyData.__cacheTs,
         code: data.daily.weather_code[idx],
         tMax: data.daily.temperature_2m_max[idx],
         tMin: data.daily.temperature_2m_min[idx],
@@ -1599,7 +1626,7 @@ async function loadMountainWeather() {
       const risk = riskFor(day);
       return `<tr>
         <td>${day.stop.label}</td>
-        <td>${day.stop.route}<br><span class="small">${day.stop.name} · ${day.stop.elev}m</span></td>
+        <td>${day.stop.route}<br><span class="small">${day.stop.name} · ${day.stop.elev}m${day.cached ? ` · cached ${cacheAgeLabel(day.ts)}` : ""}</span></td>
         <td><span class="wx-risk ${risk.cls}">${risk.label}</span><br><span class="wx-temp">${fmt(day.tMin, "°")} / ${fmt(day.tMax, "°")}</span><br><span class="small">${weatherCodeText[day.code] || "Mountain weather"}</span></td>
         <td>Rain ${fmt(day.precip, "mm")} · ${fmt(day.precipProb, "%")}<br><span class="small">Snow ${fmt(day.snow, "cm")}</span></td>
         <td>${fmt(day.wind, "km/h")}<br><span class="small">Gusts ${fmt(day.gust, "km/h")}</span></td>
@@ -1610,6 +1637,7 @@ async function loadMountainWeather() {
     </table>
     <p class="small">Thunder estimate uses explicit thunderstorm code or afternoon CAPE + precipitation probability/shower signal. It estimates when risk starts; it is not a guarantee.</p>`;
 
+    const cachedForecasts = forecasts.filter(d => d.cached).length;
     const worst = forecasts.filter(d => !d.missing).map(riskFor).some(r => r.label === "High")
       ? "High"
       : forecasts.filter(d => !d.missing).map(riskFor).some(r => r.label === "Watch")
@@ -1620,7 +1648,7 @@ async function loadMountainWeather() {
       : worst === "Watch"
         ? "Watch signal in the model: keep timings conservative and avoid late exposed sections."
         : "No major model signal right now; Santnerpass still needs hut-confirmed route conditions.";
-    status.textContent = `Updated live from Open-Meteo. ${advice}`;
+    status.textContent = `${cachedForecasts ? "Offline/cache mode: using saved Open-Meteo snapshots. " : "Updated live from Open-Meteo. "}${advice}`;
   } catch (err) {
     status.textContent = "Weather could not load. Check connection or retry later.";
     visual.innerHTML = `<p class="small">Fallback: check MeteoBlue, MeteoTrentino/South Tyrol weather, and hut reports before departure.</p>`;
