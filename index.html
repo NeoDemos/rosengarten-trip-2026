@@ -2,11 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#2f5132">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Rosengarten 2026">
+<meta name="mobile-web-app-capable" content="yes">
 <title>Rosengarten trip · June 2026</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.svg">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <style>
@@ -24,17 +27,21 @@
     --warn: #9a5d44;
     --warn-soft: #f2e2d8;
     --sky: #dfe9ed;
+    --shadow: 0 10px 28px rgba(41,40,36,0.10);
   }
   * { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
   body {
     margin: 0;
     background: var(--bg);
     color: var(--ink);
     font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 16px;
     line-height: 1.55;
+    padding-bottom: env(safe-area-inset-bottom);
   }
   .wrap { max-width: 980px; margin: 0 auto; padding: 24px 20px 64px; }
+  section, details { scroll-margin-top: 82px; }
   header {
     display: grid;
     grid-template-columns: 1.2fr 0.8fr;
@@ -51,6 +58,7 @@
   ul { margin: 8px 0; padding-left: 19px; }
   li { margin: 4px 0; }
   a { color: var(--forest); text-decoration: none; border-bottom: 1px solid currentColor; }
+  a, button, summary, input, label { touch-action: manipulation; }
   table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.94rem; }
   th, td { text-align: left; vertical-align: top; padding: 10px 9px; border-bottom: 1px solid var(--line); }
   th { background: rgba(47,81,50,0.08); color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em; }
@@ -67,6 +75,7 @@
     align-items: flex-end;
     padding: 24px;
     color: #fff;
+    box-shadow: var(--shadow);
   }
   .hero h1 { color: #fff; text-shadow: 0 1px 6px rgba(0,0,0,0.35); }
   .hero p { max-width: 760px; color: rgba(255,255,255,0.92); }
@@ -117,8 +126,23 @@
   .booked-row { background: var(--gold-soft); }
   .crux-row { background: var(--warn-soft); }
   .checklist { list-style: none; padding: 0; }
-  .checklist li { padding: 7px 0; border-bottom: 1px dashed var(--line); }
-  .checklist input { margin-right: 8px; accent-color: var(--forest); }
+  .checklist li { border-bottom: 1px dashed var(--line); }
+  .checklist label {
+    min-height: 46px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    cursor: pointer;
+  }
+  .checklist input {
+    width: 24px;
+    height: 24px;
+    margin: 1px 0 0;
+    flex: 0 0 auto;
+    accent-color: var(--forest);
+  }
+  .checklist input:checked + span { color: var(--muted); text-decoration: line-through; text-decoration-thickness: 1px; }
   .small { font-size: 0.84rem; color: var(--muted); }
   .week-schedule { overflow-x: auto; }
   .week-schedule table { min-width: 860px; }
@@ -178,6 +202,35 @@
     color: var(--muted);
   }
   .plan-pill strong { color: var(--forest); }
+  .quick-nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 10px 0;
+    margin: 4px 0 8px;
+    background: linear-gradient(180deg, var(--bg) 72%, rgba(245,241,232,0));
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .quick-nav::-webkit-scrollbar { display: none; }
+  .quick-nav a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0 14px;
+    background: rgba(255,255,255,0.94);
+    color: var(--forest);
+    font-size: 0.88rem;
+    font-weight: 750;
+    box-shadow: 0 4px 14px rgba(41,40,36,0.06);
+  }
   .day-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
   .day-card {
     background: var(--card);
@@ -227,6 +280,7 @@
     border-radius: 6px;
     padding: 9px 10px;
     font: inherit;
+    min-height: 44px;
   }
   .btn {
     border: 1px solid var(--forest);
@@ -237,6 +291,7 @@
     font: inherit;
     font-weight: 700;
     cursor: pointer;
+    min-height: 44px;
   }
   .btn.secondary { background: var(--card); color: var(--forest); }
   .hut-intel-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
@@ -278,7 +333,17 @@
   .stars { color: #b48632; letter-spacing: 0.02em; font-weight: 800; }
   .review-text { color: var(--muted); font-size: 0.86rem; border-left: 3px solid var(--line); padding-left: 9px; }
   .hut-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; }
-  .hut-links a { border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; font-size: 0.82rem; background: #fff; }
+  .hut-links a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 0.84rem;
+    background: #fff;
+  }
   .api-status { color: var(--muted); font-size: 0.86rem; }
   .snow-visual { overflow-x: auto; margin-top: 12px; }
   .snow-visual table { min-width: 860px; }
@@ -333,17 +398,35 @@
     padding: 13px 16px;
     color: var(--forest);
     user-select: none;
+    min-height: 48px;
+    display: flex;
+    align-items: center;
   }
   details > *:not(summary) { margin-left: 16px; margin-right: 16px; }
+  .table-scroll a { min-height: 44px; display: inline-flex; align-items: center; }
+  .leaflet-touch .leaflet-bar a,
+  .leaflet-bar a {
+    width: 44px;
+    height: 44px;
+    line-height: 44px;
+  }
   @media (max-width: 620px) {
-    .wrap { padding: 18px 12px 60px; }
-    .hero { min-height: 300px; padding: 18px; }
-    h1 { font-size: 1.62rem; }
+    .wrap { padding: calc(12px + env(safe-area-inset-top)) 12px calc(76px + env(safe-area-inset-bottom)); }
+    header { gap: 12px; margin-bottom: 10px; }
+    .hero { min-height: 218px; padding: 16px; }
+    .hero p { font-size: 0.94rem; line-height: 1.42; }
+    .meta { gap: 6px; margin-top: 10px; }
+    .metric { padding: 6px 8px; font-size: 0.8rem; }
+    .panel, .card, .focus-card, .day-card, .decision-card, .safety-card { padding: 13px 14px; }
+    h1 { font-size: 1.54rem; }
+    h2 { margin-top: 22px; font-size: 1.14rem; }
     table { font-size: 0.84rem; }
     th, td { padding: 8px 7px; }
     .timeline li { grid-template-columns: 78px 1fr; }
     .compact-grid { grid-template-columns: 1fr; }
     .action-item { grid-template-columns: 1fr; }
+    .day-card { min-height: auto; }
+    .day-footer { grid-template-columns: 1fr; }
     .hut-toolbar input, .hut-toolbar .btn { flex-basis: 100%; min-width: 0; width: 100%; }
     details > *:not(summary) { margin-left: 12px; margin-right: 12px; }
   }
@@ -389,7 +472,17 @@
     </div>
   </header>
 
-  <section>
+  <nav class="quick-nav" aria-label="Trip sections">
+    <a href="#plan">Plan</a>
+    <a href="#weather">Weather</a>
+    <a href="#snow">Snow</a>
+    <a href="#safety">Safety</a>
+    <a href="#huts">Huts</a>
+    <a href="#essentials">Essentials</a>
+    <a href="#packing">Pack</a>
+  </nav>
+
+  <section id="plan">
     <div class="plan-head">
       <h2>Plan</h2>
       <div class="plan-summary">
@@ -485,7 +578,7 @@
     </details>
   </section>
 
-  <section>
+  <section id="huts">
     <h2>Hut Data</h2>
     <p class="sub">Static booking facts plus optional live Google Places photos, ratings, review snippets, websites and map links. Uses the same local API key as the older planner.</p>
     <div class="hut-toolbar">
@@ -497,21 +590,21 @@
     <div id="hutIntel" class="hut-intel-grid"></div>
   </section>
 
-  <section>
+  <section id="snow">
     <h2>Passes + Snow</h2>
     <p class="sub">Observed station snow first, then modelled pass/peak snow in cm. Stations are real measurements near the route; pass and peak values are model proxies because there are no sensors on every col. Always ask the hut about the exact trail condition.</p>
     <div id="snowStatus" class="wx-loading">Loading pass and peak snow depths...</div>
     <div id="snowVisual" class="snow-visual"></div>
   </section>
 
-  <section>
+  <section id="weather">
     <h2>Mountain Weather</h2>
     <p class="sub">Live Open-Meteo forecast at booked/pending hut elevations. Monday shows both first-night options. Planning signal only: not an avalanche, snowpack, or route-condition report.</p>
     <div id="weatherStatus" class="wx-loading">Loading mountain forecast...</div>
     <div id="weatherVisual" class="weather-visual"></div>
   </section>
 
-  <section>
+  <section id="safety">
     <h2>Safety: Solo Via Ferrata + Snow</h2>
     <p class="sub">Gear assumed: helmet, harness, certified via ferrata lanyard, gloves, Hike 900 microspikes, hiking poles, Osprey Stratos 24L. Not assumed: rope, ice axe, crampons, partner rescue, or guided belay.</p>
     <div class="safety-grid">
@@ -587,7 +680,7 @@
     <div id="map"></div>
   </details>
 
-  <section>
+  <section id="essentials">
     <h2>Essentials</h2>
     <div class="compact-grid">
       <div class="focus-card">
@@ -628,7 +721,7 @@
     </details>
   </section>
 
-  <details>
+  <details id="packing">
     <summary>Packing list</summary>
     <div class="card">
       <h3>Decathlon pickup</h3>
@@ -1438,6 +1531,45 @@ document.querySelectorAll("details").forEach((details) => {
     }
   });
 });
+
+function initChecklistState() {
+  document.querySelectorAll(".checklist li").forEach((item, index) => {
+    const input = item.querySelector('input[type="checkbox"]');
+    if (!input) return;
+    const existingText = Array.from(item.childNodes)
+      .filter(node => node !== input)
+      .map(node => node.textContent || "")
+      .join("")
+      .trim();
+    if (!input.id) {
+      input.id = `check-${index}-${existingText.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 42)}`;
+    }
+    if (!item.querySelector("label")) {
+      item.textContent = "";
+      const label = document.createElement("label");
+      label.setAttribute("for", input.id);
+      const text = document.createElement("span");
+      text.textContent = existingText;
+      label.append(input, text);
+      item.append(label);
+    }
+    const key = `rosen-pack-${input.id}`;
+    input.checked = localStorage.getItem(key) === "1";
+    input.addEventListener("change", () => {
+      localStorage.setItem(key, input.checked ? "1" : "0");
+    });
+  });
+}
+
+function registerOfflineShell() {
+  if (!("serviceWorker" in navigator) || location.protocol !== "https:") return;
+  navigator.serviceWorker.register("./sw.js").catch(err => {
+    console.warn("Offline shell registration failed:", err);
+  });
+}
+
+initChecklistState();
+registerOfflineShell();
 renderHutIntel();
 loadGoogleHutData();
 loadTerrainSnow();

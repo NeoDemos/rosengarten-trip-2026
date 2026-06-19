@@ -5,7 +5,7 @@ cd "$(dirname "$0")"
 
 cp ../Rosengarten_trip_juni_2026.html index.html
 
-git add index.html README.md publish.sh
+git add index.html README.md publish.sh manifest.webmanifest icon.svg sw.js
 
 if git diff --cached --quiet; then
   echo "No changes to publish."
