@@ -1,4 +1,4 @@
-const CACHE_NAME = "rosengarten-trip-shell-v2";
+const CACHE_NAME = "rosengarten-trip-shell-v3";
 const RUNTIME_CACHE = "rosengarten-trip-runtime-v1";
 const SHELL_ASSETS = [
   "./",
