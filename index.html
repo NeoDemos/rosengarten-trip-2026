@@ -427,6 +427,37 @@
   .wx-med { background: var(--gold-soft); color: #6b4b1f; border: 1px solid var(--gold); }
   .wx-high { background: var(--warn-soft); color: var(--warn); border: 1px solid var(--warn); }
   .wx-loading { color: var(--muted); font-size: 0.9rem; padding: 12px 0; }
+  .tue-timeline { display: grid; gap: 10px; margin-top: 12px; position: relative; }
+  .tue-seg {
+    display: grid;
+    grid-template-columns: 104px 1fr;
+    gap: 14px;
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--stone);
+    border-radius: 8px;
+    background: #fff;
+    padding: 12px 14px;
+  }
+  .tue-seg.risk-low { border-left-color: var(--forest); }
+  .tue-seg.risk-med { border-left-color: var(--gold); }
+  .tue-seg.risk-high { border-left-color: var(--warn); }
+  .tue-seg.crux { background: linear-gradient(180deg, var(--warn-soft), #fff); }
+  .tue-when { color: var(--forest); font-weight: 800; font-size: 0.92rem; }
+  .tue-elev { color: var(--muted); font-size: 0.78rem; margin-top: 3px; }
+  .tue-tag { display: inline-block; margin-top: 6px; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: var(--warn); }
+  .tue-main h3 { margin: 0 0 2px; font-size: 1.02rem; }
+  .tue-place { color: var(--muted); font-size: 0.85rem; }
+  .tue-terrain { font-size: 0.88rem; margin: 7px 0 0; }
+  .tue-wx { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; margin-top: 9px; }
+  .tue-wx .chip { background: rgba(47,81,50,0.06); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; font-size: 0.8rem; color: var(--ink); }
+  .tue-risk { border-radius: 999px; padding: 3px 10px; font-size: 0.68rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
+  @media (max-width: 620px) {
+    .tue-seg { grid-template-columns: 84px 1fr; gap: 10px; padding: 10px 12px; }
+    .tue-when { font-size: 0.84rem; }
+    .tue-main h3 { font-size: 0.94rem; }
+    .tue-place, .tue-terrain { font-size: 0.82rem; }
+    .tue-wx .chip { font-size: 0.74rem; padding: 3px 7px; }
+  }
   .thunder-time { font-weight: 800; color: var(--warn); white-space: nowrap; }
   details {
     background: var(--card);
@@ -581,6 +612,7 @@
 
   <nav class="quick-nav" aria-label="Trip sections">
     <a href="#plan">Plan</a>
+    <a href="#tuesday">Tue ×Wx</a>
     <a href="#gear">Gear</a>
     <a href="#weather">Weather</a>
     <a href="#snow">Snow</a>
@@ -744,6 +776,19 @@
         </table>
       </div>
     </details>
+  </section>
+
+  <section id="tuesday">
+    <div class="field-head">
+      <div>
+        <h2>Tuesday hour-by-hour</h2>
+        <p class="sub">The crux day (23 June) split into route segments, each matched to the live Open-Meteo forecast at the Santnerpass elevation (2734 m). The whole point: see when you reach the exposed upper section versus when storm risk builds.</p>
+      </div>
+      <span class="field-call call-watch">Storm timing</span>
+    </div>
+    <div id="tueStatus" class="wx-loading">Loading Tuesday segments…</div>
+    <div id="tueTimeline" class="tue-timeline"></div>
+    <p class="small"><strong>Read it like this:</strong> a green segment is a low model signal, amber means watch, red means likely storm. Aim to be through the red/amber <em>upper</em> section before the afternoon build-up. Remember this is a 2-days-out model — confirm the morning of with a mountain forecast (Province of Bolzano / MeteoBlue) and the hut.</p>
   </section>
 
   <section id="huts">
@@ -1606,11 +1651,99 @@ function registerOfflineShell() {
   });
 }
 
+const TUE_DATE = "2026-06-23";
+const tuesdaySegments = [
+  { label: "Cable car up", time: "08:00-08:40", elev: "1182 → 1742 m", place: "Welschnofen → Frommer Alm", terrain: "König Laurin I cabin, first run 08:30. Sheltered; this is your clock starting.", hours: [8] },
+  { label: "Lower climb", time: "08:40-10:30", elev: "1742 → ~2100 m", place: "Frommer Alm → alpine path", terrain: "Steady path through forest/alm, low exposure. Settle into a pace.", hours: [9, 10] },
+  { label: "Mid climb", time: "10:30-12:30", elev: "~2100 → ~2400 m", place: "toward Kölner Hütte / Coronelle", terrain: "Open slopes. Last easy spot to bail to a lift/hut if weather turns.", hours: [11, 12] },
+  { label: "Crux: Santnerpass", time: "12:30-14:30", elev: "~2400 → 2726 m", place: "upper cabled T3 to the pass", terrain: "Short cable-assisted, exposed section — the part to clear before storms build.", hours: [13, 14], crux: true },
+  { label: "At the hut", time: "~15:00", elev: "2726 m", place: "Santnerpasshütte", terrain: "Arrival and check-in. Off exposed ground.", hours: [15] }
+];
+
+async function loadTuesday() {
+  const status = document.getElementById("tueStatus");
+  const wrap = document.getElementById("tueTimeline");
+  if (!status || !wrap) return;
+  try {
+    const params = new URLSearchParams({
+      latitude: 46.4555,
+      longitude: 11.6280,
+      elevation: 2734,
+      hourly: "weather_code,temperature_2m,precipitation_probability,precipitation,cape,wind_gusts_10m",
+      timezone: "Europe/Rome",
+      forecast_days: "10"
+    });
+    const { data, cached, ts } = await cachedJson("tue_santner", `https://api.open-meteo.com/v1/forecast?${params.toString()}`);
+    const H = data.hourly;
+    const idxByHour = {};
+    H.time.forEach((tt, i) => { if (tt.startsWith(TUE_DATE)) idxByHour[parseInt(tt.slice(11, 13), 10)] = i; });
+
+    const rows = tuesdaySegments.map(seg => {
+      const idxs = seg.hours.map(h => idxByHour[h]).filter(i => i != null);
+      let maxPop = 0, maxCape = 0, maxGust = 0, worstCode = 0, tMax = NaN, explicit = false, conv = false, shower = false;
+      idxs.forEach(i => {
+        const code = H.weather_code[i] ?? 0;
+        const p = H.precipitation_probability[i] ?? 0;
+        const rain = H.precipitation[i] ?? 0;
+        const c = H.cape[i] ?? 0;
+        const g = H.wind_gusts_10m[i] ?? 0;
+        const tp = H.temperature_2m[i];
+        maxPop = Math.max(maxPop, p);
+        maxCape = Math.max(maxCape, c);
+        maxGust = Math.max(maxGust, g);
+        if (code > worstCode) worstCode = code;
+        if (Number.isFinite(tp)) tMax = Number.isNaN(tMax) ? tp : Math.max(tMax, tp);
+        if (code >= 95) explicit = true;
+        if ([80, 81, 82].includes(code) && c >= 300) shower = true;
+        if (c >= 500 && (p >= 35 || rain >= 0.2)) conv = true;
+      });
+      let risk;
+      if (explicit) risk = { cls: "wx-high", seg: "risk-high", label: "Storm risk" };
+      else if (conv || shower || maxPop >= 35) risk = { cls: "wx-med", seg: "risk-med", label: "Watch" };
+      else if (maxPop >= 20 || maxGust >= 45) risk = { cls: "wx-med", seg: "risk-med", label: "Keep an eye" };
+      else risk = { cls: "wx-low", seg: "risk-low", label: "Looks OK" };
+      return { seg, maxPop, maxCape, maxGust, worstCode, tMax, risk };
+    });
+
+    wrap.innerHTML = rows.map(({ seg, maxPop, maxCape, maxGust, worstCode, tMax, risk }) => `
+      <div class="tue-seg ${risk.seg}${seg.crux ? " crux" : ""}">
+        <div>
+          <div class="tue-when">${seg.time}</div>
+          <div class="tue-elev">${seg.elev}</div>
+          ${seg.crux ? `<span class="tue-tag">Exposed</span>` : ""}
+        </div>
+        <div class="tue-main">
+          <h3>${escapeHTML(seg.label)}</h3>
+          <div class="tue-place">${escapeHTML(seg.place)}</div>
+          <div class="tue-terrain">${escapeHTML(seg.terrain)}</div>
+          <div class="tue-wx">
+            <span class="chip">${escapeHTML(weatherCodeText[worstCode] || "Mountain weather")}</span>
+            ${Number.isFinite(tMax) ? `<span class="chip">${fmt(tMax, "°")}</span>` : ""}
+            <span class="chip">Rain ${fmt(maxPop, "%")}</span>
+            <span class="chip">CAPE ${fmt(maxCape)}</span>
+            <span class="chip">Gust ${fmt(maxGust, " km/h")}</span>
+            <span class="tue-risk ${risk.cls}">${risk.label}</span>
+          </div>
+        </div>
+      </div>`).join("");
+
+    const worst = rows.some(r => r.risk.label === "Storm risk") ? "storm signal"
+      : rows.some(r => r.risk.label === "Watch") ? "afternoon watch signal"
+      : "low model signal";
+    status.textContent = `${cached ? "Offline/cache snapshot: " : "Live Open-Meteo, Santnerpass 2734 m. "}Tue 23 Jun shows a ${worst}${cached ? ` · saved ${cacheAgeLabel(ts)}` : ""}. Storm timing is the key uncertainty 2 days out — re-check the morning of.`;
+  } catch (err) {
+    status.textContent = "Tuesday forecast could not load. Check a mountain forecast (Province of Bolzano / MeteoBlue) and ask the hut for the day's outlook.";
+    wrap.innerHTML = "";
+    console.error(err);
+  }
+}
+
 initChecklistState();
 registerOfflineShell();
 renderHutIntel();
 loadTerrainSnow();
 loadMountainWeather();
+loadTuesday();
 </script>
 </body>
 </html>
